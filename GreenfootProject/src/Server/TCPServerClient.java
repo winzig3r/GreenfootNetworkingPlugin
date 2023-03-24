@@ -3,13 +3,13 @@ package Server;
 import java.net.*;
 import java.io.*;
 
-public class ClientHandler extends Thread {
+public class TCPServerClient extends Thread {
     private final Socket clientSocket;
     private final PrintWriter out;
     private final BufferedReader in;
 
-    public ClientHandler(Socket socket) {
-        System.out.println("Client connected");
+    public TCPServerClient(Socket socket) {
+        System.out.println("TCPClient connected");
         this.clientSocket = socket;
         try {
             out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -23,14 +23,18 @@ public class ClientHandler extends Thread {
         try {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
-                System.out.println("Message received: " + inputLine);
+                System.out.println("Message received over TCP: " + inputLine);
                 if (".".equals(inputLine)) {
-                    out.println("bye");
+                    sendMessage("bye");
                     break;
                 }
-                out.println(inputLine);
+                sendMessage(inputLine);
             }
         } catch (IOException ignored) {}
+    }
+
+    public void sendMessage(String message){
+        out.println(message);
     }
 
     public void stopSelf() {

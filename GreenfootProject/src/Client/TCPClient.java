@@ -25,7 +25,7 @@ public class TCPClient extends Thread{
 
     @Override
     public void run() {
-        System.out.println("Client was started");
+        System.out.println("TCP Client was started");
         while (true){
             System.out.println(receiveMessage());
         }
