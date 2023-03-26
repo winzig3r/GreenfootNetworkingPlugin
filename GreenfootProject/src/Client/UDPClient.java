@@ -14,10 +14,11 @@ public class UDPClient extends Thread {
         this.PORT = port;
         try {
             socket = new DatagramSocket();
-            address = InetAddress.getByName("localhost");
+            address = InetAddress.getByName(ip);
         } catch (SocketException | UnknownHostException e) {
             throw new RuntimeException(e);
         }
+        this.start();
     }
     @Override
     public void run(){

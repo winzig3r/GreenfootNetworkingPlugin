@@ -10,6 +10,7 @@ public class TCPServer extends Thread{
 
     public TCPServer(int port){
         this.PORT = port;
+        this.start();
     }
     @Override
     public void run() {

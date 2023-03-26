@@ -16,6 +16,7 @@ public class UDPServer extends Thread{
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
+        this.start();
     }
 
     @Override
@@ -31,9 +32,9 @@ public class UDPServer extends Thread{
 
             InetAddress address = packet.getAddress();
             int port = packet.getPort();
-            packet = new DatagramPacket(buf, buf.length, address, port);
             String received = new String(packet.getData(), 0, packet.getLength());
             System.out.println("Message received over UDP: " + received);
+            packet = new DatagramPacket(received.getBytes(), received.getBytes().length, address, port);
             if (received.equals("end")) {
                 boolean running = false;
                 continue;
