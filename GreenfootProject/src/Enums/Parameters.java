@@ -1,4 +1,4 @@
-package Global;
+package Enums;
 
 /**
  * All the parameters that are used in up and downstream json Messages

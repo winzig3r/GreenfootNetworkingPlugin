@@ -1,6 +1,6 @@
 package Client;
-import Global.Actions;
-import Global.Parameters;
+import Enums.Actions;
+import Enums.Parameters;
 import org.json.simple.*;
 
 

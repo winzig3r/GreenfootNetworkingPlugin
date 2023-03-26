@@ -1,8 +1,7 @@
 package Client;
 
-import Global.Actions;
-import Global.Parameters;
-import Server.Server;
+import Enums.Actions;
+import Enums.Parameters;
 import org.json.simple.JSONObject;
 
 public class MessageEncoder {
