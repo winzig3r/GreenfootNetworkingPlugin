@@ -8,8 +8,7 @@ public class TCPServerClient extends Thread {
     private final PrintWriter out;
     private final BufferedReader in;
 
-    public TCPServerClient(Socket socket) {
-        System.out.println("TCPClient connected");
+    public TCPServerClient(int id, Socket socket) {
         this.clientSocket = socket;
         try {
             out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -20,15 +19,16 @@ public class TCPServerClient extends Thread {
     }
 
     public void run() {
+        while (true){
+            receiveMessage();
+        }
+    }
+
+    private void receiveMessage(){
         try {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
-                System.out.println("Message received over TCP: " + inputLine);
-                if (".".equals(inputLine)) {
-                    sendMessage("bye");
-                    break;
-                }
-                sendMessage(inputLine);
+                MessageDecoder.getInstance().decodeMessage(inputLine);
             }
         } catch (IOException ignored) {}
     }

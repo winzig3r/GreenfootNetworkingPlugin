@@ -3,12 +3,14 @@ package Client;
 import java.net.*;
 import java.io.*;
 
-public class TCPClient extends Thread{
+public class TCPClient extends Thread {
     private Socket clientSocket;
+    private final Client self;
     private PrintWriter out;
     private BufferedReader in;
 
-    public TCPClient(String ip, int port){
+    public TCPClient(String ip, int port, Client self) {
+        this.self = self;
         startConnection(ip, port);
         this.start();
     }
@@ -26,8 +28,8 @@ public class TCPClient extends Thread{
     @Override
     public void run() {
         System.out.println("TCP Client was started");
-        while (true){
-            System.out.println(receiveMessage());
+        while (true) {
+            MessageDecoder.getInstance().decodeMessage(receiveMessage(), self);
         }
     }
 
@@ -35,7 +37,7 @@ public class TCPClient extends Thread{
         out.println(msg);
     }
 
-    public String receiveMessage(){
+    public String receiveMessage() {
         try {
             return in.readLine();
         } catch (IOException e) {

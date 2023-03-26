@@ -1,32 +1,31 @@
 package Server;
 
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 
 public class ServerClient {
-    //TCP Information
-    private final TCPServerClient tcpConnection;
 
-    // UDP Information
-    private InetAddress udpConnection;
-    private int clientUdpPort;
+    private final TCPServerClient tcpConnection;
+    private UDPServerClient udpConnection;
 
     //Other class fields
     private final int id;
-    ServerClient(int id, TCPServerClient tcpConnection){
+    public ServerClient(int id, TCPServerClient tcpConnection){
         this.id = id;
         this.tcpConnection = tcpConnection;
     }
 
-    public void recogniseUDPConnection(InetAddress udpConnection, int clientUdpPort){
+    public void recogniseUDPConnection(UDPServerClient udpConnection){
         this.udpConnection = udpConnection;
-        this.clientUdpPort = clientUdpPort;
     }
 
     public void sendTCP(String message){
         tcpConnection.sendMessage(message);
     }
 
-    public void sendUDP(String message){
+    public void sendUDP(String message){udpConnection.sendMessage(message);}
 
+    protected int getId(){
+        return this.id;
     }
 }

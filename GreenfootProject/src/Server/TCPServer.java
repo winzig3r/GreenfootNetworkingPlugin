@@ -18,7 +18,11 @@ public class TCPServer extends Thread{
         try {
             serverSocket = new ServerSocket(PORT);
             while (true) {
-                new TCPServerClient(serverSocket.accept()).start();
+                int newId = Server.getNewClientId();
+                TCPServerClient newConnection = new TCPServerClient(newId, serverSocket.accept());
+                Server.addNewClient(new ServerClient(newId, newConnection));
+                MessageEncoder.getInstance().sendHandshakeTCP(newId);
+                newConnection.start();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

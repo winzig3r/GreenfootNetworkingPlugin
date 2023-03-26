@@ -23,28 +23,20 @@ public class UDPServer extends Thread{
     public void run() {
         System.out.println("UDP Server listening on port: " + PORT);
         while (true) {
-            DatagramPacket packet = new DatagramPacket(buf, buf.length);
-            try {
-                socket.receive(packet);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            InetAddress address = packet.getAddress();
-            int port = packet.getPort();
-            String received = new String(packet.getData(), 0, packet.getLength());
-            System.out.println("Message received over UDP: " + received);
-            packet = new DatagramPacket(received.getBytes(), received.getBytes().length, address, port);
-            if (received.equals("end")) {
-                boolean running = false;
-                continue;
-            }
-            try {
-                socket.send(packet);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            receiveMessage();
         }
+    }
+
+    public void receiveMessage(){
+        DatagramPacket packet = new DatagramPacket(buf, buf.length);
+        try {
+            socket.receive(packet);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        InetAddress address = packet.getAddress();
+        int port = packet.getPort();
+        MessageDecoder.getInstance().decodeUDPMessage(new String(packet.getData(), 0, packet.getLength()), address, port, socket);
     }
 
     public void stopUDP(){

@@ -6,12 +6,14 @@ import java.net.*;
 public class UDPClient extends Thread {
     private final DatagramSocket socket;
     private final InetAddress address;
+    private final Client self;
     private byte[] buf = new byte[256];
 
     private final int PORT;
 
-    public UDPClient(String ip, int port) {
+    public UDPClient(String ip, int port, Client self) {
         this.PORT = port;
+        this.self = self;
         try {
             socket = new DatagramSocket();
             address = InetAddress.getByName(ip);
@@ -24,7 +26,7 @@ public class UDPClient extends Thread {
     public void run(){
         System.out.println("UDP Client was started");
         while (true){
-            receiveMessage();
+            MessageDecoder.getInstance().decodeMessage(receiveMessage(), self);
         }
     }
 
@@ -37,15 +39,14 @@ public class UDPClient extends Thread {
             throw new RuntimeException(e);
         }
     }
-    private void receiveMessage(){
+    private String receiveMessage(){
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
         try {
             socket.receive(packet);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        String received = new String(packet.getData(), 0, packet.getLength());
-        System.out.println(received);
+        return new String(packet.getData(), 0, packet.getLength());
     }
 
     public void close() {
