@@ -28,7 +28,7 @@ public class NetworkedActor extends Actor {
 
     public void moveSynced(int distance) {
         super.move(distance);
-        System.out.println("Sending packet");
+        System.out.println("Sending movement packet");
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendPositionUpdateUDP(myClient, this.id);
     }

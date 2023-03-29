@@ -45,7 +45,6 @@ public class MessageDecoder {
             //TODO: Check if the specified actor id even exists
             int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
             String imageFilePath = (String) jsonMessage.get(Parameters.NewImageFilePath.name());
-            System.out.println("Received an image update in client: " + imageFilePath);
             self.getActor(actorId).setImage(imageFilePath);
         } else if (action.equals(Actions.REMOVE_ACTOR)) {
             int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
