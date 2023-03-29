@@ -1,106 +1,83 @@
 package GreenfootNetworking;
 
-import Enums.ActorSyncOptions;
+import Enums.Parameters;
 import greenfoot.Actor;
-import greenfoot.GreenfootImage;
+import Client.*;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 public class NetworkedActor extends Actor {
 
-    private boolean syncPosition = false;
-    private boolean syncRotation = false;
-    private boolean syncImage = false;
+    private int id;
+    private int worldId;
 
-    @Override
-    public void act() {
-        super.act();
-        //TODO: "Somehow let the other clients know what exactly changed"
+    public NetworkedActor(String fromJson){
+        JSONObject jsonMessage = (JSONObject) JSONValue.parse(fromJson);
+        this.id = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
+        //TODO: Maybe add Location and Rotation Information to the from Json (void Actor.toJson : String)
     }
 
-    public void synchronize(ActorSyncOptions[] sync) {
-        for (ActorSyncOptions syncOption : sync) {
-            switch (syncOption) {
-                case IMAGE:
-                    syncImage = true;
-                    break;
-                case POSITION:
-                    syncPosition = true;
-                    break;
-                case ROTATION:
-                    syncRotation = true;
-                    break;
-            }
-        }
+    public NetworkedActor(int id){
+       this.id = id;
     }
 
-    public void asynchronize(ActorSyncOptions[] sync) {
-        for (ActorSyncOptions syncOption : sync) {
-            switch (syncOption) {
-                case IMAGE:
-                    syncImage = false;
-                    break;
-                case POSITION:
-                    syncPosition = false;
-                    break;
-                case ROTATION:
-                    syncRotation = false;
-                    break;
-            }
-        }
+    public NetworkedActor(){
+        Client myClient = GreenfootNetworkManager.getInstance().getClient();
+        myClient.messageEncoder.sendCreateActorTCP(myClient);
     }
 
-    @Override
-    public void move(int distance) {
+    public void moveSynced(int distance) {
         super.move(distance);
-        if(syncPosition){
-
-        }
+        System.out.println("Sending packet");
+        Client myClient = GreenfootNetworkManager.getInstance().getClient();
+        myClient.messageEncoder.sendPositionUpdateUDP(myClient, this.id);
     }
-
-    @Override
-    public void setLocation(int x, int y) {
+    public void setLocationSynced(int x, int y) {
         super.setLocation(x, y);
-        if(syncPosition){
-
-        }
+        Client myClient = GreenfootNetworkManager.getInstance().getClient();
+        myClient.messageEncoder.sendPositionUpdateUDP(myClient, this.id);
     }
 
-    @Override
-    public void turn(int amount) {
+    public void turnSynced(int amount) {
         super.turn(amount);
-        if(syncRotation){
-
-        }
+        Client myClient = GreenfootNetworkManager.getInstance().getClient();
+        myClient.messageEncoder.sendRotationUpdateUDP(myClient, this.id);
     }
 
-    @Override
-    public void turnTowards(int x, int y) {
+    public void turnTowardsSynced(int x, int y) {
         super.turnTowards(x, y);
-        if(syncRotation){
-
-        }
+        Client myClient = GreenfootNetworkManager.getInstance().getClient();
+        myClient.messageEncoder.sendRotationUpdateUDP(myClient, this.id);
     }
 
-    @Override
-    public void setRotation(int rotation) {
+    public void setRotationSynced(int rotation) {
         super.setRotation(rotation);
-        if(syncRotation){
-
-        }
+        Client myClient = GreenfootNetworkManager.getInstance().getClient();
+        myClient.messageEncoder.sendRotationUpdateUDP(myClient, this.id);
     }
 
-    @Override
-    public void setImage(String filename) throws IllegalArgumentException {
+    public void setImageSynced(String filename) throws IllegalArgumentException {
         super.setImage(filename);
-        if(syncImage){
-
-        }
+        Client myClient = GreenfootNetworkManager.getInstance().getClient();
+        myClient.messageEncoder.sendImageUpdateTCP(myClient, this.id, filename);
     }
 
-    @Override
-    public void setImage(GreenfootImage image) {
-        super.setImage(image);
-        if(syncImage){
+    public String toJsonString(){
+        JSONObject json = new JSONObject();
+        json.put(Parameters.ActorId.name(), this.id);
+        return json.toJSONString();
+    }
 
-        }
+    public void act() {
+
+    }
+
+    public int getId() {
+        return id;
+    }
+    public int getWorldId(){return worldId;}
+
+    public void setWorldId(int worldId) {
+        this.worldId = worldId;
     }
 }
