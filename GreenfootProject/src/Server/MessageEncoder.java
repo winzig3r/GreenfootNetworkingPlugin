@@ -32,11 +32,11 @@ class MessageEncoder {
         Server.broadcastTCP(message.toJSONString());
     }
 
-    protected void broadcastCreateActorTCP(String newActorInformation){
+    protected void informCreateActorTCP(String newActorInformation, int fromClient){
         JSONObject message = new JSONObject();
         message.put(Parameters.Action.name(), Actions.CREATE_ACTOR.name());
         message.put(Parameters.NewActorInformation.name(), newActorInformation);
-        Server.broadcastTCP(message.toJSONString());
+        Server.informTCP(message.toJSONString(), new int[]{fromClient});
     }
 
     protected void broadcastRemoveClientTCP(int actorId){
@@ -46,10 +46,10 @@ class MessageEncoder {
         Server.broadcastTCP(message.toJSONString());
     }
 
-    protected void broadcastAddWorldTCP(String newWorldInformation){
+    protected void informAddWorldTCP(String newWorldInformation, int fromClient){
         JSONObject message = new JSONObject();
         message.put(Parameters.Action.name(), Actions.ADD_WORLD.name());
         message.put(Parameters.NewWorldInformation.name(), newWorldInformation);
-        Server.broadcastTCP(message.toJSONString());
+        Server.informTCP(message.toJSONString(), new int[]{fromClient});
     }
 }

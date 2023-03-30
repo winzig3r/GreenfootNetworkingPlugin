@@ -23,11 +23,9 @@ public class Server {
     protected static void addActorToWorld(int actorId, int worldId){
         networkedActors.get(actorId).setWorldId(worldId);
     }
-    protected static String createNewActor(){
-        int newActorId = (networkedActors.size() == 0) ? 0 : Collections.max(networkedActors.keySet()) + 1;
-        NetworkedActor networkedActor = new NetworkedActor(newActorId);
-        networkedActors.put(newActorId, networkedActor);
-        return networkedActor.toJsonString();
+    protected static void createNewActor(String newActorInfo){
+        NetworkedActor networkedActor = new NetworkedActor(newActorInfo);
+        networkedActors.put(networkedActor.getId(), networkedActor);
     }
     protected static NetworkedActor getActor(int actorId){return networkedActors.get(actorId);}
     protected static void removeActor(int actorId){networkedActors.remove(actorId);}
@@ -37,8 +35,8 @@ public class Server {
         int worldWidth = ((Long) worldData.get(Parameters.WorldWidth.name())).intValue();
         int worldHeight = ((Long) worldData.get(Parameters.WorldHeight.name())).intValue();
         int cellSize = ((Long) worldData.get(Parameters.CellSize.name())).intValue();
-        boolean bounded = (boolean) worldData.getOrDefault(Parameters.Bounded.name(), false);
-        int newWorldId = (networkedWorlds.size() == 0) ? 0 : Collections.max(networkedWorlds.keySet()) + 1;
+        int newWorldId = ((Long) worldData.get(Parameters.WorldId.name())).intValue();
+        boolean bounded = (boolean) worldData.getOrDefault(Parameters.Bounded.name(), true);
         NetworkedWorld networkedWorld = new NetworkedWorld(worldWidth, worldHeight, cellSize, bounded, newWorldId);
         networkedWorlds.put(newWorldId, networkedWorld);
         return networkedWorld.toJsonString();

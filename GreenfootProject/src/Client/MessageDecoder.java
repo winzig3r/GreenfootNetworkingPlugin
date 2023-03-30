@@ -55,15 +55,15 @@ public class MessageDecoder {
             int worldId = ((Long)jsonMessage.get(Parameters.WorldId.name())).intValue();
             int startX = ((Long)jsonMessage.get(Parameters.NewXPosition.name())).intValue();
             int startY = ((Long)jsonMessage.get(Parameters.NewYPosition.name())).intValue();
-            self.addActor(actorId, worldId, startX, startY);
+            self.addActorToWorld(actorId, worldId, startX, startY);
         } else if (action.equals(Actions.CREATE_ACTOR)) {
             String newActorInformation = (String)jsonMessage.get(Parameters.NewActorInformation.name());
             NetworkedActor networkedActor = new NetworkedActor(newActorInformation);
-            self.createActor(networkedActor);
+            self.createGhostActor(networkedActor);
         } else if (action.equals(Actions.ADD_WORLD)) {
             String newWorldInformation = (String) jsonMessage.get(Parameters.NewWorldInformation.name());
             NetworkedWorld world = NetworkedWorld.fromJson(newWorldInformation);
-            self.addWorld(world);
+            self.addGhostWorld(world);
         } else{
             System.out.println("Action not known on client: " + jsonMessage);
         }

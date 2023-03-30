@@ -14,21 +14,15 @@ public class NetworkedActor extends Actor {
     public NetworkedActor(String fromJson){
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(fromJson);
         this.id = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
-        //TODO: Maybe add Location and Rotation Information to the from Json (void Actor.toJson : String)
-    }
-
-    public NetworkedActor(int id){
-       this.id = id;
     }
 
     public NetworkedActor(){
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
-        myClient.messageEncoder.sendCreateActorTCP(myClient);
+        myClient.createRealActor(this);
     }
 
     public void moveSynced(int distance) {
         super.move(distance);
-        System.out.println("Sending movement packet");
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendPositionUpdateUDP(myClient, this.id);
     }
@@ -68,13 +62,14 @@ public class NetworkedActor extends Actor {
         return json.toJSONString();
     }
 
-    public void act() {
-
-    }
-
     public int getId() {
         return id;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getWorldId(){return worldId;}
 
     public void setWorldId(int worldId) {

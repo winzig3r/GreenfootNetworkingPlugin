@@ -2,6 +2,7 @@ package Client;
 
 import Enums.Actions;
 import Enums.Parameters;
+import GreenfootNetworking.NetworkedActor;
 import GreenfootNetworking.NetworkedWorld;
 import org.json.simple.JSONObject;
 
@@ -59,9 +60,11 @@ public class MessageEncoder {
         self.sendTCPMessage(message.toJSONString());
     }
 
-    public void sendCreateActorTCP(Client self){
+    public void sendCreateActorTCP(Client self, NetworkedActor actor){
         JSONObject message = new JSONObject();
         message.put(Parameters.Action.name(), Actions.CREATE_ACTOR.name());
+        message.put(Parameters.NewActorInformation.name(), actor.toJsonString());
+        message.put(Parameters.ClientId.name(), self.getId());
         self.sendTCPMessage(message.toJSONString());
     }
 
@@ -75,6 +78,7 @@ public class MessageEncoder {
     public void sendAddWorldTCP(Client self, NetworkedWorld newWorld){
         JSONObject message = new JSONObject();
         message.put(Parameters.Action.name(), Actions.ADD_WORLD.name());
+        message.put(Parameters.ClientId.name(), self.getId());
         message.put(Parameters.NewWorldInformation.name(), newWorld.toJsonString());
         self.sendTCPMessage(message.toJSONString());
     }

@@ -2,8 +2,8 @@ package Client;
 
 
 import GreenfootNetworking.*;
-import greenfoot.Greenfoot;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 public class Client {
@@ -40,19 +40,32 @@ public class Client {
 
     protected NetworkedWorld getWorld(int worldId) { return networkedWorlds.get(worldId); }
 
-    protected void addWorld(NetworkedWorld world){
-        Greenfoot.setWorld(world);
+    protected void addGhostWorld(NetworkedWorld world){
         networkedWorlds.put(world.getWorldId(), world);
+    }
+
+    public void addRealWorld(NetworkedWorld world){
+        world.setWorldId((networkedWorlds.size() == 0) ? 1 : Collections.max(networkedWorlds.keySet()) + 1);
+        networkedWorlds.put(world.getWorldId(), world);
+        messageEncoder.sendAddWorldTCP(this, world);
     }
     protected NetworkedActor getActor(int actorId) {
         return networkedActors.get(actorId);
     }
-    protected void addActor(int actorId, int worldId, int startX, int startY) {
+    protected void addActorToWorld(int actorId, int worldId, int startX, int startY) {
+        System.out.println("In Client.class Adding actor ("+ actorId + " " + networkedActors.get(actorId) +") to world (" + worldId + " " + networkedWorlds.get(worldId) + ")");
         networkedWorlds.get(worldId).addObject(networkedActors.get(actorId), startX, startY);
     }
 
-    protected void createActor(NetworkedActor actor){
+    protected void createGhostActor(NetworkedActor actor){
         networkedActors.put(actor.getId(), actor);
+    }
+
+    public void createRealActor(NetworkedActor actor){
+        int newActorId = (networkedActors.size() == 0) ? 1 : Collections.max(networkedActors.keySet()) + 1;
+        actor.setId(newActorId);
+        networkedActors.put(actor.getId(), actor);
+        this.messageEncoder.sendCreateActorTCP(this, actor);
     }
 
     protected void removeActor(int actorId, int worldId) {

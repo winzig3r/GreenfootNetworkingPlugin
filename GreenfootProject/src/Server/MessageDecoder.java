@@ -50,15 +50,18 @@ class MessageDecoder {
             Server.addActorToWorld(actorId, worldId);
             MessageEncoder.getInstance().broadcastAddActorTCP(actorId, worldId, xStart, yStart);
         } else if (action.equals(Actions.CREATE_ACTOR)) {
-            String newActorInformation = Server.createNewActor();
-            MessageEncoder.getInstance().broadcastCreateActorTCP(newActorInformation);
+            String newActorInformation = (String) jsonMessage.get(Parameters.NewActorInformation.name());
+            int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
+            Server.createNewActor(newActorInformation);
+            MessageEncoder.getInstance().informCreateActorTCP(newActorInformation, fromClient);
         } else if (action.equals(Actions.REMOVE_ACTOR)) {
             int actorId = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
             Server.removeActor(actorId);
             MessageEncoder.getInstance().broadcastRemoveClientTCP(actorId);
         } else if (action.equals(Actions.ADD_WORLD)) {
             String newWorldInformation = Server.addNewWorld((String) jsonMessage.get(Parameters.NewWorldInformation.name()));
-            MessageEncoder.getInstance().broadcastAddWorldTCP(newWorldInformation);
+            int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
+            MessageEncoder.getInstance().informAddWorldTCP(newWorldInformation, fromClient);
         } else{
             System.out.println("Action not known on server: " + jsonMessage);
         }

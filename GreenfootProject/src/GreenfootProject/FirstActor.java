@@ -1,11 +1,10 @@
 package GreenfootProject;
 
 import GreenfootNetworking.NetworkedActor;
+import greenfoot.Greenfoot;
 
 public class FirstActor extends NetworkedActor {
 
-    private final int TIME_TO_STOP = 5000;
-    private int currentTime = 0;
 
     public FirstActor(){
         this.setImageSynced("images/car01.png");
@@ -13,10 +12,12 @@ public class FirstActor extends NetworkedActor {
 
 
     public void act() {
-        System.out.println("Acting");
-        if (currentTime < TIME_TO_STOP) {
-            moveSynced(3);
-            currentTime++;
+        moveSynced(3);
+        if(Greenfoot.isKeyDown("A")){
+            turnSynced(-3);
+        }
+        if(Greenfoot.isKeyDown("D")){
+            turnSynced(3);
         }
     }
 }

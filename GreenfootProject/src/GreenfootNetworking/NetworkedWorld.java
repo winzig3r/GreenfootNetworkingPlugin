@@ -3,6 +3,7 @@ package GreenfootNetworking;
 import Client.Client;
 import Enums.NetworkingOptions;
 import Enums.Parameters;
+import greenfoot.Actor;
 import greenfoot.World;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -10,18 +11,18 @@ import org.json.simple.JSONValue;
 public class NetworkedWorld extends World {
 
     private int worldId;
-    public NetworkedWorld(int worldWidth, int worldHeight, int cellSize, int worldId, NetworkingOptions options, String ip) {
+    public NetworkedWorld(int worldWidth, int worldHeight, int cellSize, NetworkingOptions options, String ip) {
         super(worldWidth, worldHeight, cellSize);
         if(GreenfootNetworkManager.notInstantiated()){
             GreenfootNetworkManager greenfootNetworkManager = new GreenfootNetworkManager(options, ip);
         }
-        this.worldId = worldId;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
-        myClient.messageEncoder.sendAddWorldTCP(myClient, this);
+        myClient.addRealWorld(this);
     }
 
     public NetworkedWorld(int worldWidth, int worldHeight, int cellSize, boolean bounded, int worldId) {
         super(worldWidth, worldHeight, cellSize, bounded);
+        this.worldId = worldId;
     }
 
     public void addNetworkObject(NetworkedActor networkedActor, int x, int y){
@@ -60,5 +61,9 @@ public class NetworkedWorld extends World {
 
     public int getWorldId(){
         return this.worldId;
+    }
+
+    public void setWorldId(int worldId) {
+        this.worldId = worldId;
     }
 }
