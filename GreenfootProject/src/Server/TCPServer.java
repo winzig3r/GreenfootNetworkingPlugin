@@ -14,13 +14,13 @@ public class TCPServer extends Thread{
     }
     @Override
     public void run() {
-        System.out.println("Server listening on port: " + PORT);
+        //System.out.println("Server listening on port: " + PORT);
         try {
             serverSocket = new ServerSocket(PORT);
             while (true) {
                 Socket newConnection = serverSocket.accept();
                 int newId = Server.getNewClientId();
-                System.out.println("New connection! Assigned id: " + newId);
+                //System.out.println("New connection! Assigned id: " + newId);
                 TCPServerClient newTCPClient = new TCPServerClient(newId, newConnection);
                 Server.addNewClient(new ServerClient(newId, newTCPClient));
                 MessageEncoder.getInstance().sendHandshakeTCP(newId);

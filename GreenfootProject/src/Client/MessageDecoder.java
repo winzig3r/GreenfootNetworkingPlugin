@@ -26,7 +26,7 @@ public class MessageDecoder {
      * @param self: The Client who received the message
      */
     protected void decodeMessage(String message, Client self){
-        System.out.println("Received message on the clientside: " + message);
+        //System.out.println("Received message on the clientside: " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action;
         try {
@@ -78,7 +78,7 @@ public class MessageDecoder {
             NetworkedActor networkedActor = new NetworkedActor(newActorInformation);
             self.createGhostActor(networkedActor);
         } else{
-            System.out.println("Action not known on client: " + jsonMessage);
+            //System.out.println("Action not known on client: " + jsonMessage);
         }
     }
 }

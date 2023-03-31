@@ -29,7 +29,7 @@ class MessageDecoder {
     }
 
     protected void decodeMessage(String message){
-        System.out.println("Received message on the Serverside: " + message);
+        //System.out.println("Received message on the Serverside: " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action;
         try {
@@ -39,14 +39,16 @@ class MessageDecoder {
         }
         if (action.equals(Actions.UPDATE_POSITION)) {
             int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
-            Server.informTCP(message, new int[]{fromClient});
+            Server.informUDP(message, new int[]{fromClient});
         } else if (action.equals(Actions.UPDATE_ROTATION)) {
             int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
             Server.informUDP(message, new int[]{fromClient});
         } else if (action.equals(Actions.UPDATE_IMAGE)) {
             int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
+            int actorId = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
+            String newImagePath = (String) jsonMessage.get(Parameters.NewImageFilePath.name());
+            Server.updateActorImage(actorId, newImagePath);
             Server.informUDP(message, new int[]{fromClient});
-            //Server.broadcastTCP(message);
         }else if (action.equals(Actions.ADD_ACTOR)) {
             int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
             int worldId = ((Long)jsonMessage.get(Parameters.WorldId.name())).intValue();
@@ -71,7 +73,7 @@ class MessageDecoder {
         } else if (action.equals(Actions.ADD_WORLD)) {
             Server.addNewWorld((String) jsonMessage.get(Parameters.NewWorldInformation.name()));
         } else{
-            System.out.println("Action not known on server: " + jsonMessage);
+            //System.out.println("Action not known on server: " + jsonMessage);
         }
     }
 }

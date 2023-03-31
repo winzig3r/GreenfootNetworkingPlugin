@@ -71,12 +71,12 @@ public class NetworkedActor extends Actor {
     @Override
     public void setImage(String filename) throws IllegalArgumentException {
         if(filename.isEmpty()) return;
+        this.imagePath = filename;
         super.setImage(filename);
     }
 
     public void setImageSynced(String filename) throws IllegalArgumentException {
         this.setImage(filename);
-        this.imagePath = filename;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendImageUpdateTCP(myClient, this.id, filename);
     }

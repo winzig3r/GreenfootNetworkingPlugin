@@ -19,10 +19,10 @@ public class GreenfootNetworkManager {
             if (networkingOptions.equals(NetworkingOptions.AsServer)) {
                 server = new Server();
             } else if (networkingOptions.equals(NetworkingOptions.AsClient)) {
-                System.out.println("Creating client");
+                //System.out.println("Creating client");
                 client = new Client(ip, 6969, 6968);
             } else if (networkingOptions.equals(NetworkingOptions.AsServerClient)) {
-                System.out.println("Creating client");
+                //System.out.println("Creating client");
                 server = new Server();
                 client = new Client("localhost", 6969, 6968);
             }

@@ -36,7 +36,7 @@ public class Client {
     }
 
     protected void setId(int newId) {
-        System.out.println("Applied new clientid: " + newId);
+        //System.out.println("Applied new clientid: " + newId);
         hasReceivedId = true;
         this.id = newId;
     }
@@ -67,10 +67,11 @@ public class Client {
     }
 
     protected void addActorToWorld(int actorId, int worldId, int startX, int startY, String imageFilePath) {
-        System.out.println("In Client.class Adding actor (" + actorId + " " + networkedActors.get(actorId) + ") to world (" + worldId + " " + networkedWorlds.get(worldId) + ")");
+        //System.out.println("In Client.class Adding actor (" + actorId + " " + networkedActors.get(actorId) + ") to world (" + worldId + " " + networkedWorlds.get(worldId) + ")");
         networkedActors.get(actorId).setWorldId(worldId);
         networkedActors.get(actorId).setImage(imageFilePath);
         networkedWorlds.get(worldId).addObject(networkedActors.get(actorId), startX, startY);
+        networkedWorlds.get(worldId).repaint();
     }
 
     protected void createGhostActor(NetworkedActor actor) {

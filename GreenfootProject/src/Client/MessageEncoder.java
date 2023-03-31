@@ -66,7 +66,7 @@ public class MessageEncoder {
         message.put(Parameters.Action.name(), Actions.CREATE_ACTOR.name());
         message.put(Parameters.NewActorInformation.name(), actor.toJsonString());
         message.put(Parameters.ClientId.name(), self.getId());
-        System.out.println("Sending creation call from client with id: " + self.getId());
+        //System.out.println("Sending creation call from client with id: " + self.getId());
         self.sendTCPMessage(message.toJSONString());
     }
 

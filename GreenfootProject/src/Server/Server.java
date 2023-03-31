@@ -104,4 +104,9 @@ public class Server {
 
     public static void main(String[] args) {
     }
+
+    public static void updateActorImage(int actorId, String newImagePath) {
+        networkedActors.get(actorId).setImage(newImagePath);
+        //System.out.println("Updated Image of actor " + actorId + " to " + newImagePath + " on server");
+    }
 }

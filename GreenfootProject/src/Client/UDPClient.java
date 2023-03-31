@@ -7,9 +7,9 @@ public class UDPClient extends Thread {
     private final DatagramSocket socket;
     private final InetAddress address;
     private final Client self;
-    private byte[] buf = new byte[2048];
-
     private final int PORT;
+
+    private final byte[] receiveBuffer = new byte[2048];
 
     public UDPClient(String ip, int port, Client self) {
         this.PORT = port;
@@ -24,14 +24,14 @@ public class UDPClient extends Thread {
     }
     @Override
     public void run(){
-        System.out.println("UDP Client was started");
+        //System.out.println("UDP Client was started");
         while (true){
             MessageDecoder.getInstance().decodeMessage(receiveMessage(), self);
         }
     }
 
     public void sendMessage(String message){
-        buf = message.getBytes();
+        byte[] buf = message.getBytes();
         DatagramPacket packet = new DatagramPacket(buf, buf.length, address, PORT);
         try {
             socket.send(packet);
@@ -40,7 +40,7 @@ public class UDPClient extends Thread {
         }
     }
     private String receiveMessage(){
-        DatagramPacket packet = new DatagramPacket(buf, buf.length);
+        DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
         try {
             socket.receive(packet);
         } catch (IOException e) {

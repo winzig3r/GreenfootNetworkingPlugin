@@ -21,7 +21,7 @@ public class UDPServer extends Thread{
 
     @Override
     public void run() {
-        System.out.println("UDP Server listening on port: " + PORT);
+        //System.out.println("UDP Server listening on port: " + PORT);
         while (true) {
             receiveMessage();
         }
