@@ -7,7 +7,7 @@ public class UDPClient extends Thread {
     private final DatagramSocket socket;
     private final InetAddress address;
     private final Client self;
-    private byte[] buf = new byte[256];
+    private byte[] buf = new byte[2048];
 
     private final int PORT;
 

@@ -5,8 +5,8 @@ import greenfoot.Greenfoot;
 
 public class FirstActor extends NetworkedActor {
 
-
     public FirstActor(){
+        System.out.println("Called constructor of first actor");
         this.setImageSynced("images/car01.png");
     }
 
@@ -19,5 +19,6 @@ public class FirstActor extends NetworkedActor {
         if(Greenfoot.isKeyDown("D")){
             turnSynced(3);
         }
+
     }
 }

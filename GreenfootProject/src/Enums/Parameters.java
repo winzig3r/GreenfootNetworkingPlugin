@@ -1,13 +1,22 @@
 package Enums;
 
+import com.pholser.junit.quickcheck.internal.ParameterTypeContext;
+
 /**
  * All the parameters that are used in up and downstream json Messages
  * @see #Action
  * @see #ClientId
+ * @see #ActorId
+ * @see #WorldId
+ * @see #NewActorInformation
+ * @see #NewXPosition
+ * @see #NewYPosition
+ * @see #NewRotation
+ * @see #NewImageFilePath
  */
 public enum Parameters {
     /**
-     * Defines the Action a message represents, All actions have to be of type Actions
+     * Defines the Action a message represents, All actions have to be of type Action
      */
     Action,
     /**
@@ -39,13 +48,34 @@ public enum Parameters {
      */
     NewRotation,
     /**
-     * Used gy the clients to inform others about a new image of a given client
+     * Used by the clients to inform others about a new image of a given client
      */
     NewImageFilePath,
+    /**
+     * Used by the Client who created the Server to tell the Server what worlds are there
+     * Used by the Server to tell new connecting clients about the worlds they can put their actors in
+     */
     NewWorldInformation,
+    /**
+     * Used in the New World Information Parameter to specify the World Width
+     */
     WorldWidth,
+    /**
+     * Used in the New World Information Parameter to specify the World Height
+     */
     WorldHeight,
+    /**
+     * Used in the New World Information Parameter to specify the Worlds Cell Size
+     */
     CellSize,
-    Bounded
+    /**
+     * Used in the New World Information Parameter to specify if the world is Bounded (true) or Unbounded (false)
+     */
+    Bounded,
+    /**
+     * Send Downstream with the Handshake to inform the new client about current Actors in the world
+     */
+    AllCurrentActors,
 
+    OldActorId,
 }

@@ -31,39 +31,49 @@ class MessageDecoder {
     protected void decodeMessage(String message){
         System.out.println("Received message on the Serverside: " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
-        Actions action = Actions.valueOf((String)jsonMessage.get(Parameters.Action.name()));
+        Actions action;
+        try {
+            action = Actions.valueOf((String)jsonMessage.get(Parameters.Action.name()));
+        }catch (Exception e){
+            action = Actions.UNKNOWN;
+        }
         if (action.equals(Actions.UPDATE_POSITION)) {
             int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
-            Server.informUDP(message, new int[]{fromClient});
+            Server.informTCP(message, new int[]{fromClient});
         } else if (action.equals(Actions.UPDATE_ROTATION)) {
             int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
             Server.informUDP(message, new int[]{fromClient});
         } else if (action.equals(Actions.UPDATE_IMAGE)) {
             int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
-//            Server.informUDP(message, new int[]{fromClient});
-            Server.broadcastTCP(message);
+            Server.informUDP(message, new int[]{fromClient});
+            //Server.broadcastTCP(message);
         }else if (action.equals(Actions.ADD_ACTOR)) {
             int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
             int worldId = ((Long)jsonMessage.get(Parameters.WorldId.name())).intValue();
             int xStart = ((Long)jsonMessage.get(Parameters.NewXPosition.name())).intValue();
             int yStart = ((Long)jsonMessage.get(Parameters.NewYPosition.name())).intValue();
-            Server.addActorToWorld(actorId, worldId);
-            MessageEncoder.getInstance().broadcastAddActorTCP(actorId, worldId, xStart, yStart);
+            String imageFile = (String) jsonMessage.get(Parameters.NewImageFilePath.name());
+            Server.addActorToWorld(actorId, worldId, xStart, yStart, imageFile);
+            MessageEncoder.getInstance().broadcastAddActorTCP(actorId, worldId, xStart, yStart, imageFile);
         } else if (action.equals(Actions.CREATE_ACTOR)) {
-            String newActorInformation = (String) jsonMessage.get(Parameters.NewActorInformation.name());
+            JSONObject newActorInformation = (JSONObject) JSONValue.parse((String) jsonMessage.get(Parameters.NewActorInformation.name()));
+            int newActorId = Server.getNewActorId();
+            int oldActorId = ((Long) newActorInformation.get(Parameters.ActorId.name())).intValue();
             int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
-            Server.createNewActor(newActorInformation);
-            MessageEncoder.getInstance().informCreateActorTCP(newActorInformation, fromClient);
+            newActorInformation.put(Parameters.ActorId.name(), newActorId);
+            Server.createNewActor(newActorInformation.toJSONString());
+            MessageEncoder.getInstance().informCreateActorTCP(newActorInformation.toJSONString(), fromClient);
+            MessageEncoder.getInstance().sendUpdateActorIdTCP(fromClient, oldActorId, newActorId);
         } else if (action.equals(Actions.REMOVE_ACTOR)) {
             int actorId = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
             Server.removeActor(actorId);
             MessageEncoder.getInstance().broadcastRemoveClientTCP(actorId);
         } else if (action.equals(Actions.ADD_WORLD)) {
-            String newWorldInformation = Server.addNewWorld((String) jsonMessage.get(Parameters.NewWorldInformation.name()));
-            int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
-            MessageEncoder.getInstance().informAddWorldTCP(newWorldInformation, fromClient);
+            Server.addNewWorld((String) jsonMessage.get(Parameters.NewWorldInformation.name()));
         } else{
             System.out.println("Action not known on server: " + jsonMessage);
         }
     }
 }
+
+//TODO: for some reason the creation call of an actor is sent before the Handshake with the server could be made

@@ -6,18 +6,36 @@ import Client.*;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import java.util.concurrent.TimeUnit;
+
 public class NetworkedActor extends Actor {
 
     private int id;
-    private int worldId;
+    private int worldId = -1;
+    private String imagePath = "";
 
     public NetworkedActor(String fromJson){
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(fromJson);
         this.id = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
+        this.worldId = ((Long) jsonMessage.get(Parameters.WorldId.name())).intValue();
+        this.imagePath = (String) jsonMessage.get(Parameters.NewImageFilePath.name());
+        this.setImage(this.imagePath);
+        if(this.worldId != -1){
+            int x = ((Long) jsonMessage.get(Parameters.NewXPosition.name())).intValue();
+            int y = ((Long) jsonMessage.get(Parameters.NewYPosition.name())).intValue();
+            GreenfootNetworkManager.getInstance().getClient().getNetworkedWorld(worldId).addObject(this, x, y);
+        }
     }
 
-    public NetworkedActor(){
+    public NetworkedActor() {
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
+        while (!myClient.hasReceivedId()){
+            try {
+                TimeUnit.MILLISECONDS.sleep(300);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
         myClient.createRealActor(this);
     }
 
@@ -50,8 +68,15 @@ public class NetworkedActor extends Actor {
         myClient.messageEncoder.sendRotationUpdateUDP(myClient, this.id);
     }
 
-    public void setImageSynced(String filename) throws IllegalArgumentException {
+    @Override
+    public void setImage(String filename) throws IllegalArgumentException {
+        if(filename.isEmpty()) return;
         super.setImage(filename);
+    }
+
+    public void setImageSynced(String filename) throws IllegalArgumentException {
+        this.setImage(filename);
+        this.imagePath = filename;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendImageUpdateTCP(myClient, this.id, filename);
     }
@@ -59,6 +84,12 @@ public class NetworkedActor extends Actor {
     public String toJsonString(){
         JSONObject json = new JSONObject();
         json.put(Parameters.ActorId.name(), this.id);
+        json.put(Parameters.WorldId.name(), this.worldId);
+        json.put(Parameters.NewImageFilePath.name(), this.imagePath);
+        if(this.worldId != -1){
+            json.put(Parameters.NewXPosition.name(), this.getX());
+            json.put(Parameters.NewYPosition.name(), this.getY());
+        }
         return json.toJSONString();
     }
 
@@ -74,5 +105,9 @@ public class NetworkedActor extends Actor {
 
     public void setWorldId(int worldId) {
         this.worldId = worldId;
+    }
+
+    public String getImagePath() {
+        return imagePath;
     }
 }

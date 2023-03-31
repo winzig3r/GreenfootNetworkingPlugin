@@ -6,6 +6,8 @@ import GreenfootNetworking.NetworkedActor;
 import GreenfootNetworking.NetworkedWorld;
 import org.json.simple.*;
 
+import java.util.Map;
+
 /**
  * A Singleton Pattern for the receiver side of a client: Decodes the JSON messages sent to the client and executes the actions bound to those sent packets
  */
@@ -26,10 +28,20 @@ public class MessageDecoder {
     protected void decodeMessage(String message, Client self){
         System.out.println("Received message on the clientside: " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
-        Actions action = Actions.valueOf((String)jsonMessage.get(Parameters.Action.name()));
+        Actions action;
+        try {
+            action = Actions.valueOf((String)jsonMessage.get(Parameters.Action.name()));
+        }catch (Exception e){
+            action = Actions.UNKNOWN;
+        }
         if(action.equals(Actions.HANDSHAKE)){
             self.setId(((Long) jsonMessage.get(Parameters.ClientId.name())).intValue());
+            JSONArray allActorData = (JSONArray) JSONValue.parse((String) jsonMessage.get(Parameters.AllCurrentActors.name()));
             MessageEncoder.getInstance().sendHandshakeUDP(self);
+            for(Object actorData : allActorData.toArray()){
+                JSONObject currentActorData = (JSONObject) JSONValue.parse((String) actorData);
+                self.createGhostActor(new NetworkedActor(currentActorData.toJSONString()));
+            }
         } else if (action.equals(Actions.UPDATE_POSITION)) {
             int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
             int newX = ((Long)jsonMessage.get(Parameters.NewXPosition.name())).intValue();
@@ -46,6 +58,10 @@ public class MessageDecoder {
             int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
             String imageFilePath = (String) jsonMessage.get(Parameters.NewImageFilePath.name());
             self.getActor(actorId).setImage(imageFilePath);
+        } else if (action.equals(Actions.UPDATE_ACTOR_ID)) {
+            int oldActorId = ((Long) jsonMessage.get(Parameters.OldActorId.name())).intValue();
+            int newActorId = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
+            self.updateActorId(oldActorId, newActorId);
         } else if (action.equals(Actions.REMOVE_ACTOR)) {
             int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
             int worldId = ((Long)jsonMessage.get(Parameters.WorldId.name())).intValue();
@@ -55,15 +71,12 @@ public class MessageDecoder {
             int worldId = ((Long)jsonMessage.get(Parameters.WorldId.name())).intValue();
             int startX = ((Long)jsonMessage.get(Parameters.NewXPosition.name())).intValue();
             int startY = ((Long)jsonMessage.get(Parameters.NewYPosition.name())).intValue();
-            self.addActorToWorld(actorId, worldId, startX, startY);
+            String imageFilePath = (String) jsonMessage.get(Parameters.NewImageFilePath.name());
+            self.addActorToWorld(actorId, worldId, startX, startY, imageFilePath);
         } else if (action.equals(Actions.CREATE_ACTOR)) {
             String newActorInformation = (String)jsonMessage.get(Parameters.NewActorInformation.name());
             NetworkedActor networkedActor = new NetworkedActor(newActorInformation);
             self.createGhostActor(networkedActor);
-        } else if (action.equals(Actions.ADD_WORLD)) {
-            String newWorldInformation = (String) jsonMessage.get(Parameters.NewWorldInformation.name());
-            NetworkedWorld world = NetworkedWorld.fromJson(newWorldInformation);
-            self.addGhostWorld(world);
         } else{
             System.out.println("Action not known on client: " + jsonMessage);
         }

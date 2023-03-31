@@ -7,7 +7,7 @@ public class UDPServer extends Thread{
 
     private final int PORT;
     private final DatagramSocket socket;
-    private final byte[] buf = new byte[256];
+    private final byte[] buf = new byte[2048];
 
     public UDPServer(int port) {
         this.PORT = port;

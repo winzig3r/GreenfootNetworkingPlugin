@@ -15,6 +15,7 @@ public class Client {
     private final TCPClient tcpClient;
     private final UDPClient udpClient;
     private int id;
+    private boolean hasReceivedId = false;
 
     public Client(String ip, int tcpPort, int udpPort) {
         tcpClient = new TCPClient(ip, tcpPort, this);
@@ -30,7 +31,13 @@ public class Client {
         udpClient.sendMessage(msg);
     }
 
+    public boolean hasReceivedId() {
+        return hasReceivedId;
+    }
+
     protected void setId(int newId) {
+        System.out.println("Applied new clientid: " + newId);
+        hasReceivedId = true;
         this.id = newId;
     }
 
@@ -38,30 +45,39 @@ public class Client {
         return id;
     }
 
-    protected NetworkedWorld getWorld(int worldId) { return networkedWorlds.get(worldId); }
+    protected NetworkedWorld getWorld(int worldId) {
+        return networkedWorlds.get(worldId);
+    }
 
-    protected void addGhostWorld(NetworkedWorld world){
+    public void addGhostWorld(NetworkedWorld world) {
         networkedWorlds.put(world.getWorldId(), world);
     }
 
-    public void addRealWorld(NetworkedWorld world){
-        world.setWorldId((networkedWorlds.size() == 0) ? 1 : Collections.max(networkedWorlds.keySet()) + 1);
+    public void addRealWorld(NetworkedWorld world) {
         networkedWorlds.put(world.getWorldId(), world);
         messageEncoder.sendAddWorldTCP(this, world);
     }
+
     protected NetworkedActor getActor(int actorId) {
         return networkedActors.get(actorId);
     }
-    protected void addActorToWorld(int actorId, int worldId, int startX, int startY) {
-        System.out.println("In Client.class Adding actor ("+ actorId + " " + networkedActors.get(actorId) +") to world (" + worldId + " " + networkedWorlds.get(worldId) + ")");
+
+    public NetworkedWorld getNetworkedWorld(int worldId) {
+        return networkedWorlds.get(worldId);
+    }
+
+    protected void addActorToWorld(int actorId, int worldId, int startX, int startY, String imageFilePath) {
+        System.out.println("In Client.class Adding actor (" + actorId + " " + networkedActors.get(actorId) + ") to world (" + worldId + " " + networkedWorlds.get(worldId) + ")");
+        networkedActors.get(actorId).setWorldId(worldId);
+        networkedActors.get(actorId).setImage(imageFilePath);
         networkedWorlds.get(worldId).addObject(networkedActors.get(actorId), startX, startY);
     }
 
-    protected void createGhostActor(NetworkedActor actor){
+    protected void createGhostActor(NetworkedActor actor) {
         networkedActors.put(actor.getId(), actor);
     }
 
-    public void createRealActor(NetworkedActor actor){
+    public void createRealActor(NetworkedActor actor) {
         int newActorId = (networkedActors.size() == 0) ? 1 : Collections.max(networkedActors.keySet()) + 1;
         actor.setId(newActorId);
         networkedActors.put(actor.getId(), actor);
@@ -73,8 +89,10 @@ public class Client {
         networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
     }
 
-    public static void main(String[] args) {
-        Client c = new Client("192.168.178.139", 6969, 6968);
-//        Client c2 = new Client("192.168.178.139", 6969, 6968);
+    public void updateActorId(int oldActorId, int newActorId) {
+        if(oldActorId == newActorId) return;
+        networkedActors.put(newActorId, networkedActors.get(oldActorId));
+        networkedActors.get(oldActorId).setId(newActorId);
+        networkedActors.remove(oldActorId);
     }
 }

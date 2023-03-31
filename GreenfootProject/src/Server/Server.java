@@ -3,11 +3,13 @@ package Server;
 import Enums.Parameters;
 import GreenfootNetworking.NetworkedActor;
 import GreenfootNetworking.NetworkedWorld;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Server {
 
@@ -20,17 +22,30 @@ public class Server {
     protected static void addNewClient(ServerClient client){serverClients.put(client.getId(), client);}
     protected static ServerClient getClient(int id){return serverClients.get(id);}
 
-    protected static void addActorToWorld(int actorId, int worldId){
+    protected static void addActorToWorld(int actorId, int worldId, int x, int y, String imageFile){
         networkedActors.get(actorId).setWorldId(worldId);
+        networkedActors.get(actorId).setImage(imageFile);
+        networkedWorlds.get(worldId).addObject(networkedActors.get(actorId), x, y);
     }
     protected static void createNewActor(String newActorInfo){
         NetworkedActor networkedActor = new NetworkedActor(newActorInfo);
         networkedActors.put(networkedActor.getId(), networkedActor);
     }
-    protected static NetworkedActor getActor(int actorId){return networkedActors.get(actorId);}
+
+    protected static int getNewActorId(){
+        return (networkedActors.size() == 0) ? 1 : Collections.max(networkedActors.keySet()) + 1;
+    }
+    protected static String getAllCurrentActors(){
+        //"[{actorId: 1}, {actorId: 2}...]"
+        JSONArray allActors = new JSONArray();
+        for(Map.Entry<Integer, NetworkedActor> kv : networkedActors.entrySet()){
+            allActors.add(kv.getValue().toJsonString());
+        }
+        return allActors.toJSONString();
+    }
     protected static void removeActor(int actorId){networkedActors.remove(actorId);}
 
-    protected static String addNewWorld(String worldDataRaw){
+    protected static void addNewWorld(String worldDataRaw){
         JSONObject worldData = (JSONObject) JSONValue.parse(worldDataRaw);
         int worldWidth = ((Long) worldData.get(Parameters.WorldWidth.name())).intValue();
         int worldHeight = ((Long) worldData.get(Parameters.WorldHeight.name())).intValue();
@@ -39,10 +54,7 @@ public class Server {
         boolean bounded = (boolean) worldData.getOrDefault(Parameters.Bounded.name(), true);
         NetworkedWorld networkedWorld = new NetworkedWorld(worldWidth, worldHeight, cellSize, bounded, newWorldId);
         networkedWorlds.put(newWorldId, networkedWorld);
-        return networkedWorld.toJsonString();
     }
-
-    protected NetworkedWorld getWorld(int worldId){return networkedWorlds.get(worldId);}
 
     protected static int getNewClientId(){
         if(serverClients.size() == 0) return 0;

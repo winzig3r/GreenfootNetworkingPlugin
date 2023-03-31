@@ -3,21 +3,26 @@ package GreenfootNetworking;
 import Client.Client;
 import Enums.NetworkingOptions;
 import Enums.Parameters;
-import greenfoot.Actor;
 import greenfoot.World;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 public class NetworkedWorld extends World {
 
-    private int worldId;
-    public NetworkedWorld(int worldWidth, int worldHeight, int cellSize, NetworkingOptions options, String ip) {
+    //HAS TO BE THE SAME ACROSS ALL CLIENTS!!!
+    private final int worldId;
+    public NetworkedWorld(int worldWidth, int worldHeight, int cellSize, NetworkingOptions options, String ip, int worldId) {
         super(worldWidth, worldHeight, cellSize);
+        this.worldId = worldId;
         if(GreenfootNetworkManager.notInstantiated()){
             GreenfootNetworkManager greenfootNetworkManager = new GreenfootNetworkManager(options, ip);
         }
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
-        myClient.addRealWorld(this);
+        if(GreenfootNetworkManager.isServer()){
+            myClient.addRealWorld(this);
+        }else{
+            myClient.addGhostWorld(this);
+        }
     }
 
     public NetworkedWorld(int worldWidth, int worldHeight, int cellSize, boolean bounded, int worldId) {
@@ -27,7 +32,7 @@ public class NetworkedWorld extends World {
 
     public void addNetworkObject(NetworkedActor networkedActor, int x, int y){
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
-        myClient.messageEncoder.sendAddActorTCP(myClient, networkedActor.getId(), this.worldId, x, y);
+        myClient.messageEncoder.sendAddActorTCP(myClient, networkedActor.getId(), this.worldId, x, y, networkedActor.getImagePath());
         //Information gets Broadcasted by the server to everyone including the client sending the message => There is no need to call super.addActor();
         //Because it is called after the message was received in the Client.addActor() method
     }
@@ -61,9 +66,5 @@ public class NetworkedWorld extends World {
 
     public int getWorldId(){
         return this.worldId;
-    }
-
-    public void setWorldId(int worldId) {
-        this.worldId = worldId;
     }
 }

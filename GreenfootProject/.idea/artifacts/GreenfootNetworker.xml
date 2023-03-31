@@ -1,0 +1,55 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="GreenfootNetworker">
+    <output-path>$PROJECT_DIR$/../../../Greenfoot/OwnProjects/TestingGreenfootPlugin/jar</output-path>
+    <root id="archive" name="GreenfootProject.jar">
+      <element id="module-output" name="GreenfootProject" />
+      <element id="dir-copy" path="C:/Program Files/Greenfoot/lib/stylesheets" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../greenfoot-sources-combined-main/threadchecker.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/bluej.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/jl1.0.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/bluejcore.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/bluejext2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/greenfoot.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/xom-1.3.7.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/guava-17.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/bluejeditor.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/lang-stride.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/opencsv-2.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/httpcore-4.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/httpmime-4.1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/nsmenufx-2.1.8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/diffutils-1.2.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/httpclient-4.1.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/classgraph-4.8.90.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/hamcrest-core-1.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-jupiter-5.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/wellbehavedfx-0.3.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-jupiter-api-5.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/commons-logging-api-1.1.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-quickcheck-core-0.9.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-jupiter-engine-5.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-jupiter-params-5.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-vintage-engine-5.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-platform-engine-1.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-platform-runner-1.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-platform-commons-1.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-platform-console-1.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-platform-testkit-1.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-platform-launcher-1.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-platform-reporting-1.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-platform-suite-api-1.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-jupiter-migrationsupport-5.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/junit-platform-console-standalone-1.5.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/javafx/lib/src.zip" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/javafx/lib/javafx-swt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/javafx/lib/javafx.web.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/javafx/lib/javafx.base.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/javafx/lib/javafx.fxml.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/javafx/lib/javafx.media.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/javafx/lib/javafx.swing.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/javafx/lib/javafx.controls.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="C:/Program Files/Greenfoot/lib/javafx/lib/javafx.graphics.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../Java JSON/json-simple-1.1.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
