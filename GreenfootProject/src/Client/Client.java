@@ -44,10 +44,6 @@ public class Client {
         return id;
     }
 
-    protected NetworkedWorld getWorld(int worldId) {
-        return networkedWorlds.get(worldId);
-    }
-
     public void addGhostWorld(NetworkedWorld world) {
         networkedWorlds.put(world.getWorldId(), world);
     }
@@ -66,7 +62,6 @@ public class Client {
     }
 
     protected void addActorToWorld(int actorId, int worldId, int startX, int startY, String imageFilePath) {
-        //System.out.println("In Client.class Adding actor (" + actorId + " " + networkedActors.get(actorId) + ") to world (" + worldId + " " + networkedWorlds.get(worldId) + ")");
         networkedActors.get(actorId).setWorldId(worldId);
         networkedActors.get(actorId).setImage(imageFilePath);
         networkedWorlds.get(worldId).addObject(networkedActors.get(actorId), startX, startY);
@@ -85,6 +80,9 @@ public class Client {
     }
 
     protected void removeActor(int actorId, int worldId) {
+        //TODO: Check if the actor was even added to the world! Sometimes the following happens:
+        // "Client sends: CREATE_ACTOR, ADD_ACTOR, REMOVE_ACTOR"
+        // "Client receives: CREATE_ACTOR, REMOVE_ACTOR (crashes l. 86), ADD_ACTOR"
         networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
         networkedActors.remove(actorId);
     }
