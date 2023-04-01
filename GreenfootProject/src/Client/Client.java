@@ -36,7 +36,6 @@ public class Client {
     }
 
     protected void setId(int newId) {
-        //System.out.println("Applied new clientid: " + newId);
         hasReceivedId = true;
         this.id = newId;
     }
@@ -86,8 +85,8 @@ public class Client {
     }
 
     protected void removeActor(int actorId, int worldId) {
-        networkedActors.remove(actorId);
         networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
+        networkedActors.remove(actorId);
     }
 
     public void updateActorId(int oldActorId, int newActorId) {

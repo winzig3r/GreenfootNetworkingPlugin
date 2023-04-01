@@ -39,7 +39,7 @@ public class NetworkedWorld extends World {
 
     public void removeNetworkObject(NetworkedActor networkedActor){
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
-        myClient.messageEncoder.sendRemoveActorTCP(myClient, networkedActor.getId());
+        myClient.messageEncoder.sendRemoveActorTCP(myClient, networkedActor.getId(), this.getWorldId());
         //Information gets Broadcasted by the server to everyone including the client sending the message => There is no need to call super.removeActor();
         //Because it is called after the message was received in the Client.removeActor() method
     }

@@ -24,13 +24,13 @@ public class MessageEncoder {
         self.sendUDPMessage(message.toJSONString());
     }
 
-    public void sendPositionUpdateUDP(Client self, int actorId){
+    public void sendPositionUpdateUDP(Client self, NetworkedActor actor){
         JSONObject message = new JSONObject();
         message.put(Parameters.Action.name(), Actions.UPDATE_POSITION.name());
         message.put(Parameters.ClientId.name(), self.getId());
-        message.put(Parameters.ActorId.name(), actorId);
-        message.put(Parameters.NewXPosition.name(), self.getActor(actorId).getX());
-        message.put(Parameters.NewYPosition.name(), self.getActor(actorId).getY());
+        message.put(Parameters.ActorId.name(), actor.getId());
+        message.put(Parameters.NewXPosition.name(), actor.getX());
+        message.put(Parameters.NewYPosition.name(), actor.getY());
         self.sendUDPMessage(message.toJSONString());
     }
     public void sendImageUpdateTCP(Client self, int actorId, String newImagePath){
@@ -70,10 +70,11 @@ public class MessageEncoder {
         self.sendTCPMessage(message.toJSONString());
     }
 
-    public void sendRemoveActorTCP(Client self, int actorId){
+    public void sendRemoveActorTCP(Client self, int actorId, int worldId){
         JSONObject message = new JSONObject();
         message.put(Parameters.Action.name(), Actions.REMOVE_ACTOR.name());
         message.put(Parameters.ActorId.name(), actorId);
+        message.put(Parameters.WorldId.name(), worldId);
         self.sendTCPMessage(message.toJSONString());
     }
 

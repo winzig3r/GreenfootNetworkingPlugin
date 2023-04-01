@@ -42,12 +42,12 @@ public class NetworkedActor extends Actor {
     public void moveSynced(int distance) {
         super.move(distance);
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
-        myClient.messageEncoder.sendPositionUpdateUDP(myClient, this.id);
+        myClient.messageEncoder.sendPositionUpdateUDP(myClient, this);
     }
     public void setLocationSynced(int x, int y) {
         super.setLocation(x, y);
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
-        myClient.messageEncoder.sendPositionUpdateUDP(myClient, this.id);
+        myClient.messageEncoder.sendPositionUpdateUDP(myClient, this);
     }
 
     public void turnSynced(int amount) {
@@ -79,6 +79,10 @@ public class NetworkedActor extends Actor {
         this.setImage(filename);
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendImageUpdateTCP(myClient, this.id, filename);
+    }
+
+    public NetworkedWorld getNetworkedWord(){
+        return GreenfootNetworkManager.getInstance().getClient().getNetworkedWorld(this.getWorldId());
     }
 
     public String toJsonString(){

@@ -68,8 +68,9 @@ class MessageDecoder {
             MessageEncoder.getInstance().sendUpdateActorIdTCP(fromClient, oldActorId, newActorId);
         } else if (action.equals(Actions.REMOVE_ACTOR)) {
             int actorId = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
-            Server.removeActor(actorId);
-            MessageEncoder.getInstance().broadcastRemoveClientTCP(actorId);
+            int worldId = ((Long) jsonMessage.get(Parameters.WorldId.name())).intValue();
+            Server.removeActor(actorId, worldId);
+            MessageEncoder.getInstance().broadcastRemoveClientTCP(actorId, worldId);
         } else if (action.equals(Actions.ADD_WORLD)) {
             Server.addNewWorld((String) jsonMessage.get(Parameters.NewWorldInformation.name()));
         } else{

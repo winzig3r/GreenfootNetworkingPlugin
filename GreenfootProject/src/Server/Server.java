@@ -43,7 +43,10 @@ public class Server {
         }
         return allActors.toJSONString();
     }
-    protected static void removeActor(int actorId){networkedActors.remove(actorId);}
+    protected static void removeActor(int actorId, int worldId){
+        networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
+        networkedActors.remove(actorId);
+    }
 
     protected static void addNewWorld(String worldDataRaw){
         JSONObject worldData = (JSONObject) JSONValue.parse(worldDataRaw);
