@@ -56,4 +56,11 @@ class MessageEncoder {
         message.put(Parameters.WorldId.name(), worldId);
         Server.broadcastTCP(message.toJSONString());
     }
+
+    protected void sendOtherActorsTCP(int fromClient) {
+        JSONObject message = new JSONObject();
+        message.put(Parameters.Action.name(), Actions.REQUEST_OTHER_ACTORS.name());
+        message.put(Parameters.AllCurrentActors.name(), Server.getAllCurrentActors());
+        Server.sendToClientTCP(message.toJSONString(), fromClient);
+    }
 }

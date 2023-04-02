@@ -21,7 +21,7 @@ class MessageDecoder {
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action = Actions.valueOf((String)jsonMessage.get(Parameters.Action.name()));
         if(action.equals(Actions.HANDSHAKE)){
-            System.out.println("Received message on the Serverside: " + message);
+            //System.out.println("Received message on the Serverside: " + message);
             int clientId = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
             Server.getClient(clientId).recogniseUDPConnection(new UDPServerClient(address, port, socket));
         }else{
@@ -30,14 +30,10 @@ class MessageDecoder {
     }
 
     protected void decodeMessage(String message){
-        System.out.println("Received message on the Serverside: " + message);
+        //System.out.println("Received message on the Serverside: " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action;
-        try {
-            action = Actions.valueOf((String)jsonMessage.get(Parameters.Action.name()));
-        }catch (Exception e){
-            action = Actions.UNKNOWN;
-        }
+        action = Actions.valueOf((String)jsonMessage.get(Parameters.Action.name()));
         if (action.equals(Actions.UPDATE_POSITION)) {
             int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
             Server.informUDP(message, new int[]{fromClient});
@@ -74,8 +70,9 @@ class MessageDecoder {
             MessageEncoder.getInstance().broadcastRemoveActorTCP(actorId, worldId);
         } else if (action.equals(Actions.ADD_WORLD)) {
             Server.addNewWorld((String) jsonMessage.get(Parameters.NewWorldInformation.name()));
-        } else{
-            //System.out.println("Action not known on server: " + jsonMessage);
+        } else if (action.equals(Actions.REQUEST_OTHER_ACTORS)) {
+            int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
+            MessageEncoder.getInstance().sendOtherActorsTCP(fromClient);
         }
     }
 }

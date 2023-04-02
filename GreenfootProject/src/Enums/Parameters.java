@@ -13,6 +13,13 @@ import com.pholser.junit.quickcheck.internal.ParameterTypeContext;
  * @see #NewYPosition
  * @see #NewRotation
  * @see #NewImageFilePath
+ * @see #NewWorldInformation
+ * @see #WorldWidth
+ * @see #WorldHeight
+ * @see #CellSize
+ * @see #Bounded
+ * @see #AllCurrentActors
+ * @see #OldActorId
  */
 public enum Parameters {
     /**
@@ -54,6 +61,7 @@ public enum Parameters {
     /**
      * Used by the Client who created the Server to tell the Server what worlds are there
      * Used by the Server to tell new connecting clients about the worlds they can put their actors in
+     * Watch out: This package is only used to inform the server about a new world and can NOT change the parameters of other clients worlds
      */
     NewWorldInformation,
     /**
@@ -76,6 +84,8 @@ public enum Parameters {
      * Send Downstream with the Handshake to inform the new client about current Actors in the world
      */
     AllCurrentActors,
-
+    /**
+     *
+     */
     OldActorId,
 }

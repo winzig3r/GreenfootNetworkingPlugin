@@ -13,6 +13,7 @@ public class Client {
 
     private final HashMap<Integer, NetworkedActor> networkedActors = new HashMap<>();
     private final HashMap<Integer, NetworkedWorld> networkedWorlds = new HashMap<>();
+    private final HashMap<Integer, NetworkedActor> lastAddedActors = new HashMap<>();
     private final TCPClient tcpClient;
     private final UDPClient udpClient;
     private int id;
@@ -50,21 +51,27 @@ public class Client {
     }
 
     public void addGhostWorld(NetworkedWorld world) {
-        networkedWorlds.put(world.getWorldId(), world);
         if(networkedWorlds.containsKey(world.getWorldId())){
-            //The reset button was pressed on a client. All Actors get removed from the world so they have to be added back by code
-            for(Map.Entry<Integer, NetworkedActor> n : networkedActors.entrySet()){
-                if(n.getValue().getWorldId() == world.getWorldId()){
-                    //We found an actor that got removed by greenfoot so lets add it back
-                    addActorToWorld(n.getValue().getId(), world.getWorldId(), n.getValue().getX(), n.getValue().getY(), n.getValue().getImagePath());
-                }
-            }
+            deleteLastActors();
+            MessageEncoder.getInstance().requestOtherActorsTCP(this);
         }
+        networkedWorlds.put(world.getWorldId(), world);
     }
 
     public void addRealWorld(NetworkedWorld world) {
+        if(networkedWorlds.containsKey(world.getWorldId())){
+            deleteLastActors();
+            MessageEncoder.getInstance().requestOtherActorsTCP(this);
+        }
         networkedWorlds.put(world.getWorldId(), world);
         messageEncoder.sendAddWorldTCP(this, world);
+    }
+
+    private void deleteLastActors(){
+        for(Map.Entry<Integer, NetworkedActor> a : lastAddedActors.entrySet()){
+            MessageEncoder.getInstance().sendRemoveActorTCP(this, a.getValue().getId(), a.getValue().getWorldId());
+        }
+        lastAddedActors.clear();
     }
 
     protected NetworkedActor getActor(int actorId) {
@@ -90,6 +97,7 @@ public class Client {
         int newActorId = (networkedActors.size() == 0) ? 1 : Collections.max(networkedActors.keySet()) + 1;
         actor.setId(newActorId);
         networkedActors.put(actor.getId(), actor);
+        lastAddedActors.put(actor.getId(), actor);
         this.messageEncoder.sendCreateActorTCP(this, actor);
     }
 

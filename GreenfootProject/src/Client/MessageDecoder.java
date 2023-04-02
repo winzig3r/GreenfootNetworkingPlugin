@@ -32,7 +32,7 @@ public class MessageDecoder {
      * @return Returns whether a message has been successfully processed or not
      */
     protected boolean decodeMessage(String message, Client self){
-        System.out.println("Received message on the clientside: " + message);
+        //System.out.println("Received message on the clientside: " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action;
         try {
@@ -49,15 +49,12 @@ public class MessageDecoder {
                 int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
                 int newX = ((Long)jsonMessage.get(Parameters.NewXPosition.name())).intValue();
                 int newY = ((Long)jsonMessage.get(Parameters.NewYPosition.name())).intValue();
-                //TODO: Check if the specified actor id even exists
                 self.getActor(actorId).setLocation(newX, newY);
             } else if (action.equals(Actions.UPDATE_ROTATION)) {
                 int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
                 int newRotation = ((Long)jsonMessage.get(Parameters.NewRotation.name())).intValue();
-                //TODO: Check if the specified actor id even exists
                 self.getActor(actorId).setRotation(newRotation);
             } else if (action.equals(Actions.UPDATE_IMAGE)) {
-                //TODO: Check if the specified actor id even exists
                 int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
                 String imageFilePath = (String) jsonMessage.get(Parameters.NewImageFilePath.name());
                 self.getActor(actorId).setImage(imageFilePath);
@@ -80,6 +77,12 @@ public class MessageDecoder {
                 String newActorInformation = (String)jsonMessage.get(Parameters.NewActorInformation.name());
                 NetworkedActor networkedActor = new NetworkedActor(newActorInformation);
                 self.createGhostActor(networkedActor);
+            } else if (action.equals(Actions.REQUEST_OTHER_ACTORS)) {
+                JSONArray allActorData = (JSONArray) JSONValue.parse((String) jsonMessage.get(Parameters.AllCurrentActors.name()));
+                for(Object actorData : allActorData.toArray()){
+                    JSONObject currentActorData = (JSONObject) JSONValue.parse((String) actorData);
+                    self.createGhostActor(new NetworkedActor(currentActorData.toJSONString()));
+                }
             }
             return true;
         }catch (NullPointerException e){

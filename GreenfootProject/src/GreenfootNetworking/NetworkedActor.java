@@ -85,7 +85,7 @@ public class NetworkedActor extends Actor {
         return GreenfootNetworkManager.getInstance().getClient().getNetworkedWorld(this.getWorldId());
     }
 
-    public String toJsonString(){
+    public String  toJsonString(){
         JSONObject json = new JSONObject();
         json.put(Parameters.ActorId.name(), this.id);
         json.put(Parameters.WorldId.name(), this.worldId);

@@ -87,4 +87,11 @@ public class MessageEncoder {
         message.put(Parameters.NewWorldInformation.name(), newWorld.toJsonString());
         self.sendTCPMessage(message.toJSONString());
     }
+
+    public void requestOtherActorsTCP(Client self) {
+        JSONObject message = new JSONObject();
+        message.put(Parameters.Action.name(), Actions.REQUEST_OTHER_ACTORS.name());
+        message.put(Parameters.ClientId.name(), self.getId());
+        self.sendTCPMessage(message.toJSONString());
+    }
 }
