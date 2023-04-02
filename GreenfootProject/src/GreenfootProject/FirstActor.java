@@ -21,7 +21,7 @@ public class FirstActor extends NetworkedActor {
             turnSynced(3);
         }
         if(Greenfoot.isKeyDown("C")){
-            NetworkedWorld nw = this.getNetworkedWord();
+            NetworkedWorld nw = this.getNetworkedWorld();
             nw.addNetworkObject(new Coin(), Greenfoot.getRandomNumber(nw.getWidth()), Greenfoot.getRandomNumber(nw.getHeight()));
         }
     }

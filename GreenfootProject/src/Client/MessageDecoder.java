@@ -32,7 +32,7 @@ public class MessageDecoder {
      * @return Returns whether a message has been successfully processed or not
      */
     protected boolean decodeMessage(String message, Client self){
-//        System.out.println("Received message on the clientside: " + message);
+        System.out.println("Received message on the clientside: " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action;
         try {
@@ -68,7 +68,7 @@ public class MessageDecoder {
             } else if (action.equals(Actions.REMOVE_ACTOR)) {
                 int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
                 int worldId = ((Long)jsonMessage.get(Parameters.WorldId.name())).intValue();
-                self.removeActor(actorId, worldId);
+                self.removeActorFromWorld(actorId, worldId);
             } else if (action.equals(Actions.ADD_ACTOR)) {
                 int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
                 int worldId = ((Long)jsonMessage.get(Parameters.WorldId.name())).intValue();
@@ -88,6 +88,10 @@ public class MessageDecoder {
         }catch (IllegalArgumentException e){
             return false;
         }
+    }
+
+    public PostExecutor getPostExecutor() {
+        return postExecutor;
     }
 
     static class PostExecutor extends Thread{

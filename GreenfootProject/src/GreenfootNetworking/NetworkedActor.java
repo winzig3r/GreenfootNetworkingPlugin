@@ -81,7 +81,7 @@ public class NetworkedActor extends Actor {
         myClient.messageEncoder.sendImageUpdateTCP(myClient, this.id, filename);
     }
 
-    public NetworkedWorld getNetworkedWord(){
+    public NetworkedWorld getNetworkedWorld(){
         return GreenfootNetworkManager.getInstance().getClient().getNetworkedWorld(this.getWorldId());
     }
 

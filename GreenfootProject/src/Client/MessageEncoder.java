@@ -25,13 +25,15 @@ public class MessageEncoder {
     }
 
     public void sendPositionUpdateUDP(Client self, NetworkedActor actor){
-        JSONObject message = new JSONObject();
-        message.put(Parameters.Action.name(), Actions.UPDATE_POSITION.name());
-        message.put(Parameters.ClientId.name(), self.getId());
-        message.put(Parameters.ActorId.name(), actor.getId());
-        message.put(Parameters.NewXPosition.name(), actor.getX());
-        message.put(Parameters.NewYPosition.name(), actor.getY());
-        self.sendUDPMessage(message.toJSONString());
+        if(actor.getWorldId() > -1){
+            JSONObject message = new JSONObject();
+            message.put(Parameters.Action.name(), Actions.UPDATE_POSITION.name());
+            message.put(Parameters.ClientId.name(), self.getId());
+            message.put(Parameters.ActorId.name(), actor.getId());
+            message.put(Parameters.NewXPosition.name(), actor.getX());
+            message.put(Parameters.NewYPosition.name(), actor.getY());
+            self.sendUDPMessage(message.toJSONString());
+        }
     }
     public void sendImageUpdateTCP(Client self, int actorId, String newImagePath){
         JSONObject message = new JSONObject();

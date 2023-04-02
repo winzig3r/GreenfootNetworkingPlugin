@@ -36,7 +36,7 @@ public class UDPServer extends Thread{
         }
         InetAddress address = packet.getAddress();
         int port = packet.getPort();
-        MessageDecoder.getInstance().decodeUDPMessage(new String(packet.getData(), 0, packet.getLength()), address, port, socket);
+        MessageDecoder.getInstance().decodeMessage(new String(packet.getData(), 0, packet.getLength()), address, port, socket);
     }
 
     public void stopUDP(){

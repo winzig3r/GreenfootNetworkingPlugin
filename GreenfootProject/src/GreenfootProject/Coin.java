@@ -20,7 +20,7 @@ public class Coin extends NetworkedActor {
     @Override
     public void act() {
         if (lived >= LIFETIME) {
-            this.getNetworkedWord().removeNetworkObject(this);
+            this.getNetworkedWorld().removeNetworkObject(this);
         }
         if (changeDirection <= 0) {
             changeDirection = Greenfoot.getRandomNumber(100);

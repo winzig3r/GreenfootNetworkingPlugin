@@ -5,6 +5,7 @@ import GreenfootNetworking.*;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Client {
 
@@ -35,6 +36,10 @@ public class Client {
         return hasReceivedId;
     }
 
+    public boolean isWorldExisting(int worldId) {
+        return networkedWorlds.containsKey(worldId);
+    }
+
     protected void setId(int newId) {
         hasReceivedId = true;
         this.id = newId;
@@ -46,6 +51,15 @@ public class Client {
 
     public void addGhostWorld(NetworkedWorld world) {
         networkedWorlds.put(world.getWorldId(), world);
+        if(networkedWorlds.containsKey(world.getWorldId())){
+            //The reset button was pressed on a client. All Actors get removed from the world so they have to be added back by code
+            for(Map.Entry<Integer, NetworkedActor> n : networkedActors.entrySet()){
+                if(n.getValue().getWorldId() == world.getWorldId()){
+                    //We found an actor that got removed by greenfoot so lets add it back
+                    addActorToWorld(n.getValue().getId(), world.getWorldId(), n.getValue().getX(), n.getValue().getY(), n.getValue().getImagePath());
+                }
+            }
+        }
     }
 
     public void addRealWorld(NetworkedWorld world) {
@@ -79,16 +93,13 @@ public class Client {
         this.messageEncoder.sendCreateActorTCP(this, actor);
     }
 
-    protected void removeActor(int actorId, int worldId) {
-        //TODO: Check if the actor was even added to the world! Sometimes the following happens:
-        // "Client sends: CREATE_ACTOR, ADD_ACTOR, REMOVE_ACTOR"
-        // "Client receives: CREATE_ACTOR, REMOVE_ACTOR (crashes l. 86), ADD_ACTOR"
+    protected void removeActorFromWorld(int actorId, int worldId) {
         networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
-        networkedActors.remove(actorId);
+        networkedActors.get(actorId).setWorldId(-1);
     }
 
     public void updateActorId(int oldActorId, int newActorId) {
-        if(oldActorId == newActorId) return;
+        if (oldActorId == newActorId) return;
         networkedActors.put(newActorId, networkedActors.get(oldActorId));
         networkedActors.get(oldActorId).setId(newActorId);
         networkedActors.remove(oldActorId);

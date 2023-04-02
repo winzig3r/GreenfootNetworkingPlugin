@@ -43,20 +43,34 @@ public class Server {
         }
         return allActors.toJSONString();
     }
-    protected static void removeActor(int actorId, int worldId){
+    protected static void removeActorFromWorld(int actorId, int worldId){
+        networkedActors.get(actorId).setWorldId(-1);
         networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
-        networkedActors.remove(actorId);
     }
 
     protected static void addNewWorld(String worldDataRaw){
         JSONObject worldData = (JSONObject) JSONValue.parse(worldDataRaw);
-        int worldWidth = ((Long) worldData.get(Parameters.WorldWidth.name())).intValue();
-        int worldHeight = ((Long) worldData.get(Parameters.WorldHeight.name())).intValue();
-        int cellSize = ((Long) worldData.get(Parameters.CellSize.name())).intValue();
         int newWorldId = ((Long) worldData.get(Parameters.WorldId.name())).intValue();
-        boolean bounded = (boolean) worldData.getOrDefault(Parameters.Bounded.name(), true);
-        NetworkedWorld networkedWorld = new NetworkedWorld(worldWidth, worldHeight, cellSize, bounded, newWorldId);
-        networkedWorlds.put(newWorldId, networkedWorld);
+        if(!networkedWorlds.containsKey(newWorldId)){
+            int worldWidth = ((Long) worldData.get(Parameters.WorldWidth.name())).intValue();
+            int worldHeight = ((Long) worldData.get(Parameters.WorldHeight.name())).intValue();
+            int cellSize = ((Long) worldData.get(Parameters.CellSize.name())).intValue();
+            boolean bounded = (boolean) worldData.getOrDefault(Parameters.Bounded.name(), true);
+            NetworkedWorld networkedWorld = new NetworkedWorld(worldWidth, worldHeight, cellSize, bounded, newWorldId);
+            networkedWorlds.put(newWorldId, networkedWorld);
+        }
+        else{
+            System.out.println("Server registered world("+newWorldId+") reset");
+            //World was reset => Clearing all networked Actors in that world and informing all clients about the reset
+            for(Map.Entry<Integer, NetworkedActor> n : networkedActors.entrySet()){
+                if(n.getValue().getWorldId() == newWorldId){
+                    System.out.println(" => Removing actor with id: " + n.getKey());
+                    removeActorFromWorld(n.getValue().getId(), newWorldId);
+                    MessageEncoder.getInstance().broadcastRemoveActorTCP(n.getValue().getId(), newWorldId);
+                    networkedActors.remove(n.getValue().getId());
+                }
+            }
+        }
     }
 
     protected static int getNewClientId(){
@@ -103,9 +117,6 @@ public class Server {
             if(a == x) return true;
         }
         return false;
-    }
-
-    public static void main(String[] args) {
     }
 
     public static void updateActorImage(int actorId, String newImagePath) {

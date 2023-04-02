@@ -17,10 +17,11 @@ class MessageDecoder {
         return instance;
     }
 
-    protected void decodeUDPMessage(String message, InetAddress address, int port, DatagramSocket socket){
+    protected void decodeMessage(String message, InetAddress address, int port, DatagramSocket socket){
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action = Actions.valueOf((String)jsonMessage.get(Parameters.Action.name()));
         if(action.equals(Actions.HANDSHAKE)){
+            System.out.println("Received message on the Serverside: " + message);
             int clientId = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
             Server.getClient(clientId).recogniseUDPConnection(new UDPServerClient(address, port, socket));
         }else{
@@ -29,7 +30,7 @@ class MessageDecoder {
     }
 
     protected void decodeMessage(String message){
-        //System.out.println("Received message on the Serverside: " + message);
+        System.out.println("Received message on the Serverside: " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action;
         try {
@@ -69,8 +70,8 @@ class MessageDecoder {
         } else if (action.equals(Actions.REMOVE_ACTOR)) {
             int actorId = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
             int worldId = ((Long) jsonMessage.get(Parameters.WorldId.name())).intValue();
-            Server.removeActor(actorId, worldId);
-            MessageEncoder.getInstance().broadcastRemoveClientTCP(actorId, worldId);
+            Server.removeActorFromWorld(actorId, worldId);
+            MessageEncoder.getInstance().broadcastRemoveActorTCP(actorId, worldId);
         } else if (action.equals(Actions.ADD_WORLD)) {
             Server.addNewWorld((String) jsonMessage.get(Parameters.NewWorldInformation.name()));
         } else{
@@ -78,5 +79,3 @@ class MessageDecoder {
         }
     }
 }
-
-//TODO: for some reason the creation call of an actor is sent before the Handshake with the server could be made
