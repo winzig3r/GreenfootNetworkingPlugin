@@ -50,14 +50,17 @@ public class MessageDecoder {
                 int newX = ((Long)jsonMessage.get(Parameters.NewXPosition.name())).intValue();
                 int newY = ((Long)jsonMessage.get(Parameters.NewYPosition.name())).intValue();
                 self.getActor(actorId).setLocation(newX, newY);
+                self.getNetworkedWorld(self.getActor(actorId).getWorldId()).repaint();
             } else if (action.equals(Actions.UPDATE_ROTATION)) {
                 int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
                 int newRotation = ((Long)jsonMessage.get(Parameters.NewRotation.name())).intValue();
                 self.getActor(actorId).setRotation(newRotation);
+                self.getNetworkedWorld(self.getActor(actorId).getWorldId()).repaint();
             } else if (action.equals(Actions.UPDATE_IMAGE)) {
                 int actorId = ((Long)jsonMessage.get(Parameters.ActorId.name())).intValue();
                 String imageFilePath = (String) jsonMessage.get(Parameters.NewImageFilePath.name());
                 self.getActor(actorId).setImage(imageFilePath);
+                self.getNetworkedWorld(self.getActor(actorId).getWorldId()).repaint();
             } else if (action.equals(Actions.UPDATE_ACTOR_ID)) {
                 int oldActorId = ((Long) jsonMessage.get(Parameters.OldActorId.name())).intValue();
                 int newActorId = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();

@@ -54,6 +54,7 @@ public class Server {
     }
 
     protected static void removeActorFromWorld(int actorId, int worldId) {
+        if(networkedActors.get(actorId).getWorldId() == -1) return;
         networkedActors.get(actorId).setWorldId(-1);
         networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
     }
