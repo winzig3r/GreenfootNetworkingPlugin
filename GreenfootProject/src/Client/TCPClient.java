@@ -27,7 +27,6 @@ public class TCPClient extends Thread {
 
     @Override
     public void run() {
-        //System.out.println("TCP Client was started");
         while (true) {
             MessageDecoder.getInstance().decodeMessage(receiveMessage(), self);
         }
@@ -43,6 +42,12 @@ public class TCPClient extends Thread {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void changeConnection(String ip, int port){
+        this.interrupt();
+        stopConnection();
+        startConnection(ip, port);
     }
 
     public void stopConnection() {

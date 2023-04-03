@@ -68,15 +68,15 @@ public class MessageEncoder {
         message.put(Parameters.Action.name(), Actions.CREATE_ACTOR.name());
         message.put(Parameters.NewActorInformation.name(), actor.toJsonString());
         message.put(Parameters.ClientId.name(), self.getId());
-        //System.out.println("Sending creation call from client with id: " + self.getId());
         self.sendTCPMessage(message.toJSONString());
     }
 
-    public void sendRemoveActorTCP(Client self, int actorId, int worldId){
+    public void sendRemoveActorTCP(Client self, int actorId, int worldId, boolean removeCompletly){
         JSONObject message = new JSONObject();
         message.put(Parameters.Action.name(), Actions.REMOVE_ACTOR.name());
         message.put(Parameters.ActorId.name(), actorId);
         message.put(Parameters.WorldId.name(), worldId);
+        message.put(Parameters.RemoveCompletely.name(), removeCompletly);
         self.sendTCPMessage(message.toJSONString());
     }
 

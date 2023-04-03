@@ -69,7 +69,7 @@ public class Client {
 
     private void deleteLastActors(){
         for(Map.Entry<Integer, NetworkedActor> a : lastAddedActors.entrySet()){
-            MessageEncoder.getInstance().sendRemoveActorTCP(this, a.getValue().getId(), a.getValue().getWorldId());
+            MessageEncoder.getInstance().sendRemoveActorTCP(this, a.getValue().getId(), a.getValue().getWorldId(), true);
         }
         lastAddedActors.clear();
     }
@@ -111,5 +111,16 @@ public class Client {
         networkedActors.put(newActorId, networkedActors.get(oldActorId));
         networkedActors.get(oldActorId).setId(newActorId);
         networkedActors.remove(oldActorId);
+    }
+
+    public void repaintWorlds() {
+        for(Map.Entry<Integer, NetworkedWorld> nw : networkedWorlds.entrySet()){
+            nw.getValue().repaint();
+        }
+    }
+
+    public void changeConnection(String ip, int tcpPort, int udpPort) {
+        tcpClient.changeConnection(ip, tcpPort);
+        udpClient.changeConnection(ip, udpPort);
     }
 }

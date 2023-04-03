@@ -7,19 +7,33 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Server {
 
-    private static final UDPServer udpServer = new UDPServer(6968);
-    private static final TCPServer tcpServer = new TCPServer(6969);
+    private static UDPServer udpServer;
+    private static TCPServer tcpServer;
 
     private static final HashMap<Integer, ServerClient> serverClients = new HashMap<>();
     private static final HashMap<Integer, NetworkedActor> networkedActors = new HashMap<>();
     private static final HashMap<Integer, NetworkedWorld> networkedWorlds = new HashMap<>();
+
+    public static void reset(){
+        udpServer.stopUDP();
+        tcpServer.stopServer();
+        serverClients.clear();
+        networkedActors.clear();
+        networkedWorlds.clear();
+        Server.tcpServer = null;
+        Server.udpServer = null;
+    }
+
+    public static void start(){
+        Server.udpServer = new UDPServer(6968);
+        Server.tcpServer = new TCPServer(6969);
+    }
 
     protected static void addNewClient(ServerClient client) {
         serverClients.put(client.getId(), client);
@@ -53,10 +67,11 @@ public class Server {
         return allActors.toJSONString();
     }
 
-    protected static void removeActorFromWorld(int actorId, int worldId) {
+    protected static void removeActorFromWorld(int actorId, int worldId, boolean removeCompletely) {
         if(networkedActors.get(actorId).getWorldId() == -1) return;
         networkedActors.get(actorId).setWorldId(-1);
         networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
+        if(removeCompletely) networkedActors.remove(actorId);
     }
 
     protected static void addNewWorld(String worldDataRaw) {
@@ -70,6 +85,10 @@ public class Server {
             NetworkedWorld networkedWorld = new NetworkedWorld(worldWidth, worldHeight, cellSize, bounded, newWorldId);
             networkedWorlds.put(newWorldId, networkedWorld);
         }
+    }
+
+    public static void addNewWorld(NetworkedWorld world){
+        networkedWorlds.put(world.getWorldId(), world);
     }
 
     protected static int getNewClientId() {
@@ -120,6 +139,13 @@ public class Server {
 
     public static void updateActorImage(int actorId, String newImagePath) {
         networkedActors.get(actorId).setImage(newImagePath);
-        //System.out.println("Updated Image of actor " + actorId + " to " + newImagePath + " on server");
+    }
+
+    public static void updateActorRotation(int actorId, int newRotation) {
+        networkedActors.get(actorId).setRotation(newRotation);
+    }
+
+    public static void updateActorPosition(int actorId, int newX, int newY) {
+        networkedActors.get(actorId).setLocation(newX, newY);
     }
 }

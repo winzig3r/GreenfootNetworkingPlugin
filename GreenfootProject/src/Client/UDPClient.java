@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.net.*;
 
 public class UDPClient extends Thread {
-    private final DatagramSocket socket;
-    private final InetAddress address;
+    private DatagramSocket socket;
+    private InetAddress address;
+    private int PORT;
     private final Client self;
-    private final int PORT;
 
     private final byte[] receiveBuffer = new byte[2048];
 
@@ -24,7 +24,6 @@ public class UDPClient extends Thread {
     }
     @Override
     public void run(){
-        //System.out.println("UDP Client was started");
         while (true){
             MessageDecoder.getInstance().decodeMessage(receiveMessage(), self);
         }
@@ -49,7 +48,15 @@ public class UDPClient extends Thread {
         return new String(packet.getData(), 0, packet.getLength());
     }
 
-    public void close() {
-        socket.close();
+    public void changeConnection(String ip, int port){
+        this.interrupt();
+        this.PORT = port;
+        try {
+            socket = new DatagramSocket();
+            address = InetAddress.getByName(ip);
+        } catch (SocketException | UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
+        this.start();
     }
 }

@@ -21,7 +21,6 @@ class MessageDecoder {
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action = Actions.valueOf((String)jsonMessage.get(Parameters.Action.name()));
         if(action.equals(Actions.HANDSHAKE)){
-            //System.out.println("Received message on the Serverside: " + message);
             int clientId = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
             Server.getClient(clientId).recogniseUDPConnection(new UDPServerClient(address, port, socket));
         }else{
@@ -30,16 +29,22 @@ class MessageDecoder {
     }
 
     protected void decodeMessage(String message){
-        //System.out.println("Received message on the Serverside: " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action;
         action = Actions.valueOf((String)jsonMessage.get(Parameters.Action.name()));
         if (action.equals(Actions.UPDATE_POSITION)) {
             int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
+            int actorId = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
+            int newX = ((Long) jsonMessage.get(Parameters.NewXPosition.name())).intValue();
+            int newY = ((Long) jsonMessage.get(Parameters.NewYPosition.name())).intValue();
             Server.informUDP(message, new int[]{fromClient});
+            Server.updateActorPosition(actorId, newX, newY);
         } else if (action.equals(Actions.UPDATE_ROTATION)) {
             int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
+            int actorId = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
+            int newRotation = ((Long) jsonMessage.get(Parameters.NewRotation.name())).intValue();
             Server.informUDP(message, new int[]{fromClient});
+            Server.updateActorRotation(actorId, newRotation);
         } else if (action.equals(Actions.UPDATE_IMAGE)) {
             int fromClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
             int actorId = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
@@ -66,7 +71,8 @@ class MessageDecoder {
         } else if (action.equals(Actions.REMOVE_ACTOR)) {
             int actorId = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
             int worldId = ((Long) jsonMessage.get(Parameters.WorldId.name())).intValue();
-            Server.removeActorFromWorld(actorId, worldId);
+            boolean removeCompletely = (boolean) jsonMessage.get(Parameters.RemoveCompletely.name());
+            Server.removeActorFromWorld(actorId, worldId, removeCompletely);
             MessageEncoder.getInstance().broadcastRemoveActorTCP(actorId, worldId);
         } else if (action.equals(Actions.ADD_WORLD)) {
             Server.addNewWorld((String) jsonMessage.get(Parameters.NewWorldInformation.name()));

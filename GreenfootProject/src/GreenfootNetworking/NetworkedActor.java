@@ -24,10 +24,12 @@ public class NetworkedActor extends Actor {
             int x = ((Long) jsonMessage.get(Parameters.NewXPosition.name())).intValue();
             int y = ((Long) jsonMessage.get(Parameters.NewYPosition.name())).intValue();
             GreenfootNetworkManager.getInstance().getClient().getNetworkedWorld(worldId).addObject(this, x, y);
+            this.setRotation(((Long) jsonMessage.get(Parameters.NewRotation.name())).intValue());
         }
     }
 
     public NetworkedActor() {
+        if(!GreenfootNetworkManager.isClient()) return;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         while (!myClient.hasReceivedId()){
             try {
@@ -41,29 +43,34 @@ public class NetworkedActor extends Actor {
 
     public void moveSynced(int distance) {
         super.move(distance);
+        if(!GreenfootNetworkManager.isClient()) return;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendPositionUpdateUDP(myClient, this);
     }
     public void setLocationSynced(int x, int y) {
         super.setLocation(x, y);
+        if(!GreenfootNetworkManager.isClient()) return;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendPositionUpdateUDP(myClient, this);
     }
 
     public void turnSynced(int amount) {
         super.turn(amount);
+        if(!GreenfootNetworkManager.isClient()) return;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendRotationUpdateUDP(myClient, this.id);
     }
 
     public void turnTowardsSynced(int x, int y) {
         super.turnTowards(x, y);
+        if(!GreenfootNetworkManager.isClient()) return;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendRotationUpdateUDP(myClient, this.id);
     }
 
     public void setRotationSynced(int rotation) {
         super.setRotation(rotation);
+        if(!GreenfootNetworkManager.isClient()) return;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendRotationUpdateUDP(myClient, this.id);
     }
@@ -77,6 +84,7 @@ public class NetworkedActor extends Actor {
 
     public void setImageSynced(String filename) throws IllegalArgumentException {
         this.setImage(filename);
+        if(!GreenfootNetworkManager.isClient()) return;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendImageUpdateTCP(myClient, this.id, filename);
     }
@@ -93,6 +101,7 @@ public class NetworkedActor extends Actor {
         if(this.worldId != -1){
             json.put(Parameters.NewXPosition.name(), this.getX());
             json.put(Parameters.NewYPosition.name(), this.getY());
+            json.put(Parameters.NewRotation.name(), this.getRotation());
         }
         return json.toJSONString();
     }

@@ -1,7 +1,5 @@
 package Enums;
 
-import com.pholser.junit.quickcheck.internal.ParameterTypeContext;
-
 /**
  * All the parameters that are used in up and downstream json Messages
  * @see #Action
@@ -88,4 +86,6 @@ public enum Parameters {
      *
      */
     OldActorId,
+
+    RemoveCompletely;
 }

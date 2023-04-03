@@ -2,17 +2,21 @@ package Server;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.concurrent.TimeoutException;
 
 public class UDPServer extends Thread{
 
     private final int PORT;
+    private boolean running;
     private final DatagramSocket socket;
     private final byte[] buf = new byte[2048];
 
     public UDPServer(int port) {
+        this.running = true;
         this.PORT = port;
         try {
             socket = new DatagramSocket(PORT);
+            socket.setReuseAddress(true);
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
@@ -21,8 +25,8 @@ public class UDPServer extends Thread{
 
     @Override
     public void run() {
-        //System.out.println("UDP Server listening on port: " + PORT);
-        while (true) {
+        if(!this.running) return;
+        while (running) {
             receiveMessage();
         }
     }
@@ -32,7 +36,8 @@ public class UDPServer extends Thread{
         try {
             socket.receive(packet);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            running = false;
+            return;
         }
         InetAddress address = packet.getAddress();
         int port = packet.getPort();
@@ -40,7 +45,8 @@ public class UDPServer extends Thread{
     }
 
     public void stopUDP(){
-        this.interrupt();
+        running = false;
+        socket.disconnect();
         socket.close();
     }
 }

@@ -3,9 +3,9 @@ package GreenfootNetworking;
 import Client.Client;
 import Enums.NetworkingOptions;
 import Enums.Parameters;
+import Server.Server;
 import greenfoot.World;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 public class NetworkedWorld extends World {
 
@@ -14,9 +14,7 @@ public class NetworkedWorld extends World {
     public NetworkedWorld(int worldWidth, int worldHeight, int cellSize, NetworkingOptions options, String ip, int worldId) {
         super(worldWidth, worldHeight, cellSize);
         this.worldId = worldId;
-        if(GreenfootNetworkManager.notInstantiated()){
-            GreenfootNetworkManager greenfootNetworkManager = new GreenfootNetworkManager(options, ip);
-        }
+        GreenfootNetworkManager greenfootNetworkManager = new GreenfootNetworkManager(options, ip);
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         if(GreenfootNetworkManager.isServer()){
             myClient.addRealWorld(this);
@@ -31,6 +29,7 @@ public class NetworkedWorld extends World {
     }
 
     public void addNetworkObject(NetworkedActor networkedActor, int x, int y){
+        if(!GreenfootNetworkManager.isClient()) return;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
         myClient.messageEncoder.sendAddActorTCP(myClient, networkedActor.getId(), this.worldId, x, y, networkedActor.getImagePath());
         //Information gets Broadcasted by the server to everyone including the client sending the message => There is no need to call super.addActor();
@@ -38,8 +37,9 @@ public class NetworkedWorld extends World {
     }
 
     public void removeNetworkObject(NetworkedActor networkedActor){
+        if(!GreenfootNetworkManager.isClient()) return;
         Client myClient = GreenfootNetworkManager.getInstance().getClient();
-        myClient.messageEncoder.sendRemoveActorTCP(myClient, networkedActor.getId(), this.getWorldId());
+        myClient.messageEncoder.sendRemoveActorTCP(myClient, networkedActor.getId(), this.getWorldId(), false);
         //Information gets Broadcasted by the server to everyone including the client sending the message => There is no need to call super.removeActor();
         //Because it is called after the message was received in the Client.removeActor() method
     }
@@ -53,18 +53,6 @@ public class NetworkedWorld extends World {
         //TODO: Add bounded parameter
         return jsonObject.toJSONString();
     }
-
-    public static NetworkedWorld fromJson(String fromJson){
-        JSONObject worldData = (JSONObject) JSONValue.parse(fromJson);
-        int worldWidth = ((Long) worldData.get(Parameters.WorldWidth.name())).intValue();
-        int worldHeight = ((Long) worldData.get(Parameters.WorldHeight.name())).intValue();
-        int cellSize = ((Long) worldData.get(Parameters.CellSize.name())).intValue();
-        int worldId = ((Long) worldData.get(Parameters.WorldId.name())).intValue();
-        boolean bounded = (boolean) worldData.getOrDefault(Parameters.Bounded.name(), false);
-        return new NetworkedWorld(worldWidth, worldHeight, cellSize, bounded, worldId);
-    }
-
-
 
     public int getWorldId(){
         return this.worldId;

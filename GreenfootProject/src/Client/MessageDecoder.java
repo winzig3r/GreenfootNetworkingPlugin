@@ -32,7 +32,6 @@ public class MessageDecoder {
      * @return Returns whether a message has been successfully processed or not
      */
     protected boolean decodeMessage(String message, Client self){
-        //System.out.println("Received message on the clientside: " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action;
         try {
@@ -86,6 +85,7 @@ public class MessageDecoder {
                     JSONObject currentActorData = (JSONObject) JSONValue.parse((String) actorData);
                     self.createGhostActor(new NetworkedActor(currentActorData.toJSONString()));
                 }
+                self.repaintWorlds();
             }
             return true;
         }catch (NullPointerException e){
