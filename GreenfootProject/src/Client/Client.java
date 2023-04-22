@@ -3,7 +3,7 @@ package Client;
 
 import GreenfootNetworking.*;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,16 +13,18 @@ public class Client {
 
     private final HashMap<Integer, NetworkedActor> networkedActors = new HashMap<>();
     private final HashMap<Integer, NetworkedWorld> networkedWorlds = new HashMap<>();
-    private final HashMap<Integer, NetworkedActor> lastAddedActors = new HashMap<>();
     private final TCPClient tcpClient;
     private final UDPClient udpClient;
+    private final ActorHandler actorHandler;
     private int id;
+    private int createdActors = 0;
     private boolean hasReceivedId = false;
 
     public Client(String ip, int tcpPort, int udpPort) {
         tcpClient = new TCPClient(ip, tcpPort, this);
         udpClient = new UDPClient(ip, udpPort, this);
         messageEncoder = MessageEncoder.getInstance();
+        actorHandler = new ActorHandler(this);
     }
 
     protected void sendTCPMessage(String msg) {
@@ -37,22 +39,19 @@ public class Client {
         return hasReceivedId;
     }
 
-    public boolean isWorldExisting(int worldId) {
-        return networkedWorlds.containsKey(worldId);
-    }
-
     protected void setId(int newId) {
         hasReceivedId = true;
         this.id = newId;
     }
 
-    protected int getId() {
+    public int getId() {
         return id;
     }
 
     public void addGhostWorld(NetworkedWorld world) {
         if(networkedWorlds.containsKey(world.getWorldId())){
-            deleteLastActors();
+            MessageEncoder.getInstance().sendResetWorldTCP(this);
+            removeClientActors(this.getId());
             MessageEncoder.getInstance().requestOtherActorsTCP(this);
         }
         networkedWorlds.put(world.getWorldId(), world);
@@ -60,19 +59,14 @@ public class Client {
 
     public void addRealWorld(NetworkedWorld world) {
         if(networkedWorlds.containsKey(world.getWorldId())){
-            deleteLastActors();
+            MessageEncoder.getInstance().sendResetWorldTCP(this);
+            removeClientActors(this.getId());
             MessageEncoder.getInstance().requestOtherActorsTCP(this);
         }
         networkedWorlds.put(world.getWorldId(), world);
         messageEncoder.sendAddWorldTCP(this, world);
     }
 
-    private void deleteLastActors(){
-        for(Map.Entry<Integer, NetworkedActor> a : lastAddedActors.entrySet()){
-            MessageEncoder.getInstance().sendRemoveActorTCP(this, a.getValue().getId(), a.getValue().getWorldId(), true);
-        }
-        lastAddedActors.clear();
-    }
 
     protected NetworkedActor getActor(int actorId) {
         return networkedActors.get(actorId);
@@ -82,37 +76,20 @@ public class Client {
         return networkedWorlds.get(worldId);
     }
 
-    protected void addActorToWorld(int actorId, int worldId, int startX, int startY, String imageFilePath) {
-        networkedActors.get(actorId).setWorldId(worldId);
-        networkedActors.get(actorId).setImage(imageFilePath);
-        networkedWorlds.get(worldId).addObject(networkedActors.get(actorId), startX, startY);
-        networkedWorlds.get(worldId).repaint();
-    }
-
     protected void createGhostActor(NetworkedActor actor) {
         networkedActors.put(actor.getId(), actor);
     }
 
     public void createRealActor(NetworkedActor actor) {
-        int newActorId = (networkedActors.size() == 0) ? 1 : Collections.max(networkedActors.keySet()) + 1;
-        actor.setId(newActorId);
+        createdActors++;
+        if(networkedActors.containsKey(createdActors)) {
+            createRealActor(actor);
+            return;
+        }
+        actor.setId(createdActors);
         networkedActors.put(actor.getId(), actor);
-        lastAddedActors.put(actor.getId(), actor);
         this.messageEncoder.sendCreateActorTCP(this, actor);
     }
-
-    protected void removeActorFromWorld(int actorId, int worldId) {
-        networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
-        networkedActors.get(actorId).setWorldId(-1);
-    }
-
-    public void updateActorId(int oldActorId, int newActorId) {
-        if (oldActorId == newActorId) return;
-        networkedActors.put(newActorId, networkedActors.get(oldActorId));
-        networkedActors.get(oldActorId).setId(newActorId);
-        networkedActors.remove(oldActorId);
-    }
-
     public void repaintWorlds() {
         for(Map.Entry<Integer, NetworkedWorld> nw : networkedWorlds.entrySet()){
             nw.getValue().repaint();
@@ -122,5 +99,56 @@ public class Client {
     public void changeConnection(String ip, int tcpPort, int udpPort) {
         tcpClient.changeConnection(ip, tcpPort);
         udpClient.changeConnection(ip, udpPort);
+    }
+
+    public void makeActorAddable(int oldActorId, int newActorId) {
+        if (oldActorId != newActorId){
+            if(newActorId > createdActors){
+                createdActors++;
+            }
+            networkedActors.get(oldActorId).setId(newActorId);
+            networkedActors.put(newActorId, networkedActors.get(oldActorId));
+            networkedActors.remove(oldActorId);
+        }
+        networkedActors.get(newActorId).setAddableToWorld(true);
+    }
+
+    public void informToAdd(NetworkedActor addable) {
+        MessageEncoder.getInstance().sendAddActorToWorldTCP(this, addable);
+    }
+
+    public void informToRemove(NetworkedActor removable){
+        MessageEncoder.getInstance().sendRemoveActorFromWorldTCP(this, removable);
+        networkedWorlds.get(removable.getWorldId()).removeObject(removable);
+        removable.setWorldId(-1);
+    }
+
+    public void receiveToAdd(int actorId, int worldId, int startX, int startY){
+        networkedActors.get(actorId).setWorldId(worldId);
+        networkedActors.get(actorId).setStartX(startX);
+        networkedActors.get(actorId).setStartY(startY);
+        networkedWorlds.get(worldId).addObject(networkedActors.get(actorId), startX, startY);
+    }
+
+    public ActorHandler getActorHandler(){
+        return this.actorHandler;
+    }
+
+    public void receiveToRemove(int actorId, int worldId) {
+        if(networkedActors.get(actorId).getWorldId() == -1) return;
+        networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
+        networkedActors.get(actorId).setWorldId(-1);
+    }
+
+    public void removeClientActors(int fromClient) {
+        ArrayList<Integer> actorsToRemove = new ArrayList<>();
+        for (Map.Entry<Integer, NetworkedActor> networkedActorEntry : networkedActors.entrySet()) {
+            if (networkedActorEntry.getValue().getCreatorClient() != fromClient) continue;
+            receiveToRemove(networkedActorEntry.getValue().getId(), networkedActorEntry.getValue().getWorldId());
+            actorsToRemove.add(networkedActorEntry.getKey());
+        }
+        for (int actorToRemove : actorsToRemove) {
+            networkedActors.remove(actorToRemove);
+        }
     }
 }

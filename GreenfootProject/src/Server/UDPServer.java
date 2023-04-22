@@ -16,7 +16,6 @@ public class UDPServer extends Thread{
         this.PORT = port;
         try {
             socket = new DatagramSocket(PORT);
-            socket.setReuseAddress(true);
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
@@ -25,7 +24,6 @@ public class UDPServer extends Thread{
 
     @Override
     public void run() {
-        if(!this.running) return;
         while (running) {
             receiveMessage();
         }

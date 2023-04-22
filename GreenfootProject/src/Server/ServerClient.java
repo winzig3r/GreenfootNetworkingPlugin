@@ -1,7 +1,5 @@
 package Server;
 
-import java.net.DatagramPacket;
-import java.net.InetAddress;
 
 public class ServerClient {
 
@@ -23,7 +21,9 @@ public class ServerClient {
         tcpConnection.sendMessage(message);
     }
 
-    public void sendUDP(String message){udpConnection.sendMessage(message);}
+    public void sendUDP(String message){
+        udpConnection.sendMessage(message);
+    }
 
     protected int getId(){
         return this.id;

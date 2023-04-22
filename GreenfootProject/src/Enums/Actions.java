@@ -8,11 +8,8 @@ import GreenfootNetworking.NetworkedWorld;
  * @see #UPDATE_POSITION
  * @see #UPDATE_ROTATION
  * @see #UPDATE_IMAGE
- * @see #ADD_ACTOR
  * @see #CREATE_ACTOR
- * @see #REMOVE_ACTOR
  * @see #ADD_WORLD
- * @see #UPDATE_ACTOR_ID
  * @see #REQUEST_OTHER_ACTORS
  */
 public enum Actions {
@@ -53,16 +50,6 @@ public enum Actions {
      */
     UPDATE_IMAGE,
     /**
-     * Parameters used Upstream & Downstream:
-     * {@link Parameters#ActorId}, int, defines the actor that gets added to the world <br>
-     * {@link Parameters#WorldId}, int, defines the world the actor should be added to <br>
-     * {@link Parameters#NewXPosition}, int, defines the XPosition the actor should be initially placed on, only if already in world <br>
-     * {@link Parameters#NewYPosition}, int, defines the YPosition the actor should be initially placed on, only if already in world <br>
-     * {@link Parameters#NewImageFilePath}, String, defines the Path to the image the actor should initially have <br>
-     * Sent from the world as soon as {@link NetworkedWorld#addNetworkObject(NetworkedActor, int, int)} is called
-     */
-    ADD_ACTOR,
-    /**
      * Parameters used Upstream & Downstream
      * {@link Parameters#NewActorInformation}, JObject, defines the information of the newly created actor {@link NetworkedActor#toJsonString()} <br>
      * {@link Parameters#ActorId}, int, defines the id of the actor being created
@@ -76,17 +63,26 @@ public enum Actions {
     /**
      *
      */
-    REMOVE_ACTOR,
+    CREATED_ACTOR,
+    /**
+     *
+     */
+    ADD_ACTOR_TO_WORLD,
+    /**
+     *
+     */
+    REMOVE_ACTOR_FROM_WORLD,
     /**
      *
      */
     ADD_WORLD,
     /**
-     *
-     */
-    UPDATE_ACTOR_ID,
-    /**
      * 
      */
-    REQUEST_OTHER_ACTORS
+    REQUEST_OTHER_ACTORS,
+    /**
+     *
+     */
+    RESET
+
 }

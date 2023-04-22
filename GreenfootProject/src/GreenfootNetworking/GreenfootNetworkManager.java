@@ -21,23 +21,9 @@ public class GreenfootNetworkManager {
             } else if (networkingOptions.equals(NetworkingOptions.AsClient)) {
                 client = new Client(ip, 6969, 6968);
             }
+            this.currentNetworkingOptions = networkingOptions;
             instance = this;
-        }else{
-            if(instance.currentNetworkingOptions == networkingOptions) return;
-            //There was already an instance created => networking Options were changed
-            if((instance.currentNetworkingOptions.equals(NetworkingOptions.AsServer) || instance.currentNetworkingOptions.equals(NetworkingOptions.AsServerClient)) && networkingOptions.equals(NetworkingOptions.AsClient)){
-                //Changed from being a Server or a Server and a client to being only a client
-                System.out.println("Changing from Server to ServerClient || Client");
-                Server.reset();
-                instance.client.changeConnection(ip, 6969, 6968);
-            } else if (instance.currentNetworkingOptions.equals(NetworkingOptions.AsClient) && (networkingOptions.equals(NetworkingOptions.AsServer) || networkingOptions.equals(NetworkingOptions.AsServerClient))) {
-                //Changed from being only a client to being a server or a server and a client
-                System.out.println("Changing from Client to ServerClient || Server");
-                Server.start();
-                instance.client.changeConnection("localhost", 6969, 6968);
-            }
         }
-        instance.currentNetworkingOptions = networkingOptions;
     }
 
     public static boolean isServer() {

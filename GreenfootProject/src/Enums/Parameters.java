@@ -86,6 +86,12 @@ public enum Parameters {
      *
      */
     OldActorId,
-
-    RemoveCompletely;
+    /**
+     *
+     */
+    RemoveCompletely,
+    /**
+     *
+     */
+    BaseClass;
 }

@@ -7,12 +7,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Server {
 
+    private static int actorsCreated = 0;
     private static UDPServer udpServer;
     private static TCPServer tcpServer;
 
@@ -20,7 +22,7 @@ public class Server {
     private static final HashMap<Integer, NetworkedActor> networkedActors = new HashMap<>();
     private static final HashMap<Integer, NetworkedWorld> networkedWorlds = new HashMap<>();
 
-    public static void reset(){
+    public static void reset() {
         udpServer.stopUDP();
         tcpServer.stopServer();
         serverClients.clear();
@@ -30,7 +32,7 @@ public class Server {
         Server.udpServer = null;
     }
 
-    public static void start(){
+    public static void start() {
         Server.udpServer = new UDPServer(6968);
         Server.tcpServer = new TCPServer(6969);
     }
@@ -43,19 +45,19 @@ public class Server {
         return serverClients.get(id);
     }
 
-    protected static void addActorToWorld(int actorId, int worldId, int x, int y, String imageFile) {
+    protected static void addActorToWorld(int actorId, int worldId, int x, int y) {
         networkedActors.get(actorId).setWorldId(worldId);
-        networkedActors.get(actorId).setImage(imageFile);
         networkedWorlds.get(worldId).addObject(networkedActors.get(actorId), x, y);
     }
 
-    protected static void createNewActor(String newActorInfo) {
+    protected static void createNewActor(JSONObject newActorInfo) {
         NetworkedActor networkedActor = new NetworkedActor(newActorInfo);
         networkedActors.put(networkedActor.getId(), networkedActor);
     }
 
     protected static int getNewActorId() {
-        return (networkedActors.size() == 0) ? 1 : Collections.max(networkedActors.keySet()) + 1;
+        actorsCreated++;
+        return actorsCreated;
     }
 
     protected static String getAllCurrentActors() {
@@ -67,11 +69,10 @@ public class Server {
         return allActors.toJSONString();
     }
 
-    protected static void removeActorFromWorld(int actorId, int worldId, boolean removeCompletely) {
-        if(networkedActors.get(actorId).getWorldId() == -1) return;
+    protected static void removeActorFromWorld(int actorId, int worldId) {
+        if (networkedActors.get(actorId).getWorldId() == -1) return;
         networkedActors.get(actorId).setWorldId(-1);
         networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
-        if(removeCompletely) networkedActors.remove(actorId);
     }
 
     protected static void addNewWorld(String worldDataRaw) {
@@ -87,7 +88,7 @@ public class Server {
         }
     }
 
-    public static void addNewWorld(NetworkedWorld world){
+    public static void addNewWorld(NetworkedWorld world) {
         networkedWorlds.put(world.getWorldId(), world);
     }
 
@@ -104,7 +105,7 @@ public class Server {
 
     protected static void broadcastUDP(String message) {
         for (ServerClient client : serverClients.values()) {
-            client.sendTCP(message);
+            client.sendUDP(message);
         }
     }
 
@@ -117,7 +118,9 @@ public class Server {
 
     protected static void informUDP(String message, int[] exclude) {
         for (ServerClient client : serverClients.values()) {
-            if (isInArr(exclude, client.getId())) continue;
+            if (isInArr(exclude, client.getId())) {
+                continue;
+            }
             client.sendUDP(message);
         }
     }
@@ -147,5 +150,17 @@ public class Server {
 
     public static void updateActorPosition(int actorId, int newX, int newY) {
         networkedActors.get(actorId).setLocation(newX, newY);
+    }
+
+    public static void removeClientActors(int fromClient) {
+        ArrayList<Integer> actorsToRemove = new ArrayList<>();
+        for (Map.Entry<Integer, NetworkedActor> networkedActorEntry : networkedActors.entrySet()) {
+            if (networkedActorEntry.getValue().getCreatorClient() != fromClient) continue;
+            removeActorFromWorld(networkedActorEntry.getValue().getId(), networkedActorEntry.getValue().getWorldId());
+            actorsToRemove.add(networkedActorEntry.getKey());
+        }
+        for (int actorToRemove : actorsToRemove) {
+            networkedActors.remove(actorToRemove);
+        }
     }
 }

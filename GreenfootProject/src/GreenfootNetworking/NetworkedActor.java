@@ -9,17 +9,24 @@ import org.json.simple.JSONValue;
 import java.util.concurrent.TimeUnit;
 
 public class NetworkedActor extends Actor {
-
     private int id;
     private int worldId = -1;
+    private int startX = 0;
+    private int startY = 0;
+    private int creatorClient;
+    private boolean addableToWorld;
     private String imagePath = "";
+    private String baseClass;
 
-    public NetworkedActor(String fromJson){
-        JSONObject jsonMessage = (JSONObject) JSONValue.parse(fromJson);
+    public NetworkedActor(JSONObject fromJson){
+        JSONObject jsonMessage =(JSONObject) JSONValue.parse(fromJson.toJSONString());
         this.id = ((Long) jsonMessage.get(Parameters.ActorId.name())).intValue();
         this.worldId = ((Long) jsonMessage.get(Parameters.WorldId.name())).intValue();
         this.imagePath = (String) jsonMessage.get(Parameters.NewImageFilePath.name());
+        this.creatorClient = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
+        this.baseClass = (String) jsonMessage.get(Parameters.BaseClass.name());
         this.setImage(this.imagePath);
+
         if(this.worldId != -1){
             int x = ((Long) jsonMessage.get(Parameters.NewXPosition.name())).intValue();
             int y = ((Long) jsonMessage.get(Parameters.NewYPosition.name())).intValue();
@@ -38,6 +45,8 @@ public class NetworkedActor extends Actor {
                 throw new RuntimeException(e);
             }
         }
+        baseClass = this.getClass().getName();
+        creatorClient = myClient.getId();
         myClient.createRealActor(this);
     }
 
@@ -93,17 +102,31 @@ public class NetworkedActor extends Actor {
         return GreenfootNetworkManager.getInstance().getClient().getNetworkedWorld(this.getWorldId());
     }
 
-    public String  toJsonString(){
+    public String toJsonString(){
         JSONObject json = new JSONObject();
         json.put(Parameters.ActorId.name(), this.id);
         json.put(Parameters.WorldId.name(), this.worldId);
         json.put(Parameters.NewImageFilePath.name(), this.imagePath);
+        json.put(Parameters.ClientId.name(), this.creatorClient);
+        json.put(Parameters.BaseClass.name(), baseClass);
         if(this.worldId != -1){
             json.put(Parameters.NewXPosition.name(), this.getX());
             json.put(Parameters.NewYPosition.name(), this.getY());
             json.put(Parameters.NewRotation.name(), this.getRotation());
         }
         return json.toJSONString();
+    }
+
+    public boolean isOwnActor(){
+        return creatorClient == GreenfootNetworkManager.getInstance().getClient().getId();
+    }
+
+    public int getCreatorClient(){
+        return creatorClient;
+    }
+
+    public String getBaseClass() {
+        return baseClass;
     }
 
     public int getId() {
@@ -122,5 +145,27 @@ public class NetworkedActor extends Actor {
 
     public String getImagePath() {
         return imagePath;
+    }
+    public void setAddableToWorld(boolean addableToWorld) {
+        this.addableToWorld = addableToWorld;
+    }
+    public boolean isAddableToWorld() {
+        return addableToWorld;
+    }
+
+    public void setStartX(int startX) {
+        this.startX = startX;
+    }
+
+    public void setStartY(int startY) {
+        this.startY = startY;
+    }
+
+    public int getStartX() {
+        return startX;
+    }
+
+    public int getStartY() {
+        return startY;
     }
 }
