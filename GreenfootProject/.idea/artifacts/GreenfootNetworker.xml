@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="GreenfootNetworker">
-    <output-path>$PROJECT_DIR$/../../../Greenfoot/OwnProjects/TestingGreenfootPlugin/jar</output-path>
+    <output-path>$PROJECT_DIR$/../TestingGreenfootPlugin/jar</output-path>
     <root id="archive" name="GreenfootProject.jar">
       <element id="module-output" name="GreenfootProject" />
       <element id="dir-copy" path="C:/Program Files/Greenfoot/lib/stylesheets" />
