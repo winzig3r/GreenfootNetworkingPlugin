@@ -1,6 +1,6 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
-import GreenfootNetworking.*;
-import Enums.*;
+import de.webspired.GreenfootNetworking.*;
+import de.webspired.Enums.*;
 /**
  * Write a description of class MyWorld here.
  * 

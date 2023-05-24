@@ -1,13 +1,13 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
-import GreenfootNetworking.*;
-import Enums.*;
+import de.webspired.GreenfootNetworking.*;
+import de.webspired.Enums.*;
 /**
  * Write a description of class WorldTwo here.
  * 
  * @author (your name) 
  * @version (a version number or a date)
  */
-public class WorldTwo extends World
+public class WorldTwo extends NetworkedWorld
 {
 
     public WorldTwo()
@@ -21,7 +21,7 @@ public class WorldTwo extends World
     private void prepare()
     {
         Player player = new Player();
-        addObject(player,260,203);
+        addNetworkObject(player,260,203);
         Trigger trigger = new Trigger();
         addObject(trigger,497,205);
     }

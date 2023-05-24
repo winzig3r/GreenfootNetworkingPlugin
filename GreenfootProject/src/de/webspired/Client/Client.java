@@ -12,12 +12,14 @@ public class Client {
     public MessageEncoder messageEncoder;
 
     private final HashMap<Integer, NetworkedActor> networkedActors = new HashMap<>();
+    private final HashMap<Integer, NetworkedActor> lateNetworkedActors = new HashMap<>();
     private final HashMap<Integer, NetworkedWorld> networkedWorlds = new HashMap<>();
     private final TCPClient tcpClient;
     private final UDPClient udpClient;
     private final ActorHandler actorHandler;
     private int id;
     private int createdActors = 0;
+    private int loadedWorlds = 0;
     private boolean hasReceivedId = false;
 
     public Client(String ip, int tcpPort, int udpPort) {
@@ -41,7 +43,7 @@ public class Client {
 
     /**
      * Sets the id to the newId and sets hasReceivedId to true @see
-     * @param newId
+     * @param newId The new id of the client
      */
     protected void setId(int newId) {
         hasReceivedId = true;
@@ -52,21 +54,35 @@ public class Client {
         return id;
     }
 
-    public void addGhostWorld(NetworkedWorld world) {
-        if(networkedWorlds.containsKey(world.getWorldId())){
+    public void updateWorldAfterJoin(NetworkedWorld world){
+        ArrayList<Integer> removableLateActors = new ArrayList<>();
+        if(loadedWorlds > 0){
             MessageEncoder.getInstance().sendResetWorldTCP(this);
             removeClientActors(this.getId());
+        }
+        if(networkedWorlds.containsKey(world.getWorldId())){
             MessageEncoder.getInstance().requestOtherActorsTCP(this);
         }
+        for(Map.Entry<Integer, NetworkedActor> lateActor : lateNetworkedActors.entrySet()){
+            if(lateActor.getValue().getWorldId() == world.getWorldId()){
+                world.addObject(lateActor.getValue(), lateActor.getValue().getStartX(), lateActor.getValue().getStartY());
+                removableLateActors.add(lateActor.getValue().getId());
+            }
+        }
+        for(int removableLateActor : removableLateActors){
+            lateNetworkedActors.remove(removableLateActor);
+        }
+        loadedWorlds += 1;
+    }
+
+    public void addGhostWorld(NetworkedWorld world) {
+        updateWorldAfterJoin(world);
         networkedWorlds.put(world.getWorldId(), world);
+        messageEncoder.sendAddWorldTCP(this, world);
     }
 
     public void addRealWorld(NetworkedWorld world) {
-        if(networkedWorlds.containsKey(world.getWorldId())){
-            MessageEncoder.getInstance().sendResetWorldTCP(this);
-            removeClientActors(this.getId());
-            MessageEncoder.getInstance().requestOtherActorsTCP(this);
-        }
+        updateWorldAfterJoin(world);
         networkedWorlds.put(world.getWorldId(), world);
         messageEncoder.sendAddWorldTCP(this, world);
     }
@@ -128,20 +144,28 @@ public class Client {
     }
 
     public void receiveToAdd(int actorId, int worldId, int startX, int startY){
+        if(!this.networkedWorlds.containsKey(worldId)){
+            networkedActors.get(actorId).setWorldId(worldId);
+            networkedActors.get(actorId).setStartX(startX);
+            networkedActors.get(actorId).setStartY(startY);
+            lateNetworkedActors.put(actorId, networkedActors.get(actorId));
+            return;
+        }
         networkedActors.get(actorId).setWorldId(worldId);
         networkedActors.get(actorId).setStartX(startX);
         networkedActors.get(actorId).setStartY(startY);
         networkedWorlds.get(worldId).addObject(networkedActors.get(actorId), startX, startY);
     }
 
-    public ActorHandler getActorHandler(){
-        return this.actorHandler;
-    }
-
     public void receiveToRemove(int actorId, int worldId) {
+        lateNetworkedActors.remove(actorId);
         if(networkedActors.get(actorId).getWorldId() == -1) return;
         networkedWorlds.get(worldId).removeObject(networkedActors.get(actorId));
         networkedActors.get(actorId).setWorldId(-1);
+    }
+
+    public ActorHandler getActorHandler(){
+        return this.actorHandler;
     }
 
     public void removeClientActors(int fromClient) {

@@ -32,7 +32,7 @@ public class MessageDecoder {
      * @return Returns whether a message has been successfully processed or not
      */
     protected boolean decodeMessage(String message, Client self){
-        System.out.println("Received message on client ("+self.getId()+"): " + message);
+        //System.out.println("Received message on client ("+self.getId()+"): " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action;
         try {
@@ -118,7 +118,7 @@ public class MessageDecoder {
             while(!Thread.currentThread().isInterrupted()){
                 if(unprocessedMessages.size() > 0){
                     AbstractMap.SimpleEntry<Integer, String> currentMessage = unprocessedMessages.get(0);
-//                    System.out.println("Reexecuting message: " + currentMessage.getValue());
+                    //System.out.println("Reexecuting message: " + currentMessage.getValue());
                     boolean completed = decoder.decodeMessage(currentMessage.getValue(), GreenfootNetworkManager.getInstance().getClient());
                     synchronized (unprocessedMessages){
                         if (!completed && currentMessage.getKey() < 10) {

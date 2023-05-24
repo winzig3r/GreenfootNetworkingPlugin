@@ -1,5 +1,5 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
-import GreenfootNetworking.*;
+import de.webspired.GreenfootNetworking.*;
 
 /**
  * Write a description of class Player here.
@@ -9,6 +9,10 @@ import GreenfootNetworking.*;
  */
 public class Player extends NetworkedActor
 {
+    public Player(){
+        this.setImageSynced("images/ppl1.png");
+    }
+    
     public void act()
     {
         if(Greenfoot.isKeyDown("W")){

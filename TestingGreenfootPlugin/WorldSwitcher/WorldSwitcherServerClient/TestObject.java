@@ -1,5 +1,5 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
-import GreenfootNetworking.*;
+import de.webspired.GreenfootNetworking.*;
 /**
  * Write a description of class TestObject here.
  * 

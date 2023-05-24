@@ -30,7 +30,7 @@ class MessageDecoder {
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action = Actions.valueOf((String) jsonMessage.get(Parameters.Action.name()));
         if (action.equals(Actions.HANDSHAKE)) {
-            System.out.println("Received message on server (UDP): " + message);
+            //System.out.println("Received message on server (UDP): " + message);
             int clientId = ((Long) jsonMessage.get(Parameters.ClientId.name())).intValue();
             Server.getClient(clientId).recogniseUDPConnection(new UDPServerClient(address, port, socket));
         } else {
@@ -39,7 +39,7 @@ class MessageDecoder {
     }
 
     protected boolean decodeMessage(String message) {
-        System.out.println("Received message on server (TCP): " + message);
+        //System.out.println("Received message on server (TCP): " + message);
         JSONObject jsonMessage = (JSONObject) JSONValue.parse(message);
         Actions action;
         try {
