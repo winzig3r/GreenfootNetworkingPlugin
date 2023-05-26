@@ -21,7 +21,7 @@ public class WorldTwo extends NetworkedWorld
     private void prepare()
     {
         Player player = new Player();
-        addObject(player,260,203);
+        addNetworkObject(player,260,203);
         Trigger trigger = new Trigger();
         addObject(trigger,497,205);
     }
